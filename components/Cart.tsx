@@ -4,11 +4,24 @@ import { buildWhatsAppOrderMessage, getWhatsAppLink } from '@/lib/whatsapp';
 import { useCartStore } from '@/store/cart-store';
 
 export function Cart({ waPhone, businessName }: { waPhone: string; businessName: string }) {
-  const { items, removeItem, getSubtotal, getTotal, deliveryType, address, paymentMethod, minOrder } = useCartStore();
+  const { items, removeItem, getSubtotal, getTotal, getDeliveryFee, deliveryType, address, references, paymentMethod } = useCartStore();
 
+  const subtotal = getSubtotal();
   const total = getTotal();
-  const canOrder = getSubtotal() >= minOrder;
-  const message = buildWhatsAppOrderMessage({ businessName, items, total, deliveryType, address, paymentMethod });
+  const deliveryFee = getDeliveryFee();
+
+  const message = buildWhatsAppOrderMessage({
+    businessName,
+    items,
+    total,
+    subtotal,
+    deliveryFee,
+    deliveryType,
+    address,
+    references,
+    paymentMethod
+  });
+
   const link = getWhatsAppLink(waPhone, message);
 
   return (
@@ -19,7 +32,11 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
           <li key={item.id} className="flex items-center justify-between rounded-lg border p-2">
             <div>
               <p className="font-medium">{item.productName}</p>
-              <p className="text-zinc-500">{item.config.tortilla} · {item.config.extras.join(', ') || 'sin extras'}</p>
+              {item.config ? (
+                <p className="text-zinc-500">{item.config.tortilla} · {item.config.extras.join(', ') || 'sin extras'}</p>
+              ) : (
+                <p className="text-zinc-500">Producto estándar</p>
+              )}
             </div>
             <div className="text-right">
               <p>${item.subtotal}</p>
@@ -30,12 +47,12 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
           </li>
         ))}
       </ul>
-      <p className="font-bold">Total: ${total}</p>
-      {!canOrder ? <p className="text-xs text-red-600">Pedido mínimo: ${minOrder}</p> : null}
-      <a
-        href={canOrder ? link : '#'}
-        className={`block rounded-lg px-3 py-2 text-center text-sm font-semibold text-white ${canOrder ? 'bg-green-600' : 'bg-zinc-400'}`}
-      >
+      <div className="rounded-lg bg-zinc-50 p-2 text-sm dark:bg-zinc-800">
+        <p>Subtotal: ${subtotal}</p>
+        <p>Envío: ${deliveryFee}</p>
+        <p className="font-bold">Total: ${total}</p>
+      </div>
+      <a href={link} className="block rounded-lg bg-green-600 px-3 py-2 text-center text-sm font-semibold text-white">
         Enviar por WhatsApp
       </a>
     </aside>

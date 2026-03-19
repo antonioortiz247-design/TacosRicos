@@ -1,21 +1,19 @@
 import { Header } from '@/components/Header';
+import { OrdersPanel } from '@/components/OrdersPanel';
 
-const statuses = ['pending', 'confirmed', 'preparing', 'ready', 'on_the_way', 'delivered'];
+const demoOrders = [
+  { id: '1001', customer: 'Luis', total: 180, status: 'pending' as const },
+  { id: '1002', customer: 'Ana', total: 240, status: 'preparing' as const },
+  { id: '1003', customer: 'Carlos', total: 130, status: 'on_the_way' as const }
+];
 
 export default function OrdersPage() {
   return (
     <main className="mx-auto min-h-screen max-w-6xl p-4">
-      <Header title="Admin · Pedidos" subtitle="Seguimiento de estados" />
-      <section className="mt-4 rounded-xl border bg-white p-4">
-        <h2 className="font-semibold">Estados soportados</h2>
-        <ul className="mt-2 grid grid-cols-2 gap-2 text-sm">
-          {statuses.map((status) => (
-            <li key={status} className="rounded border p-2">
-              {status}
-            </li>
-          ))}
-        </ul>
-      </section>
+      <Header title="Admin · Pedidos" subtitle="Cambiar estado, filtrar y ver detalle" />
+      <div className="mt-4">
+        <OrdersPanel initialOrders={demoOrders} />
+      </div>
     </main>
   );
 }

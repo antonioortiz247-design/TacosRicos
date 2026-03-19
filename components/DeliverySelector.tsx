@@ -3,17 +3,17 @@
 import { useCartStore } from '@/store/cart-store';
 
 export function DeliverySelector() {
-  const { deliveryType, setDelivery, address, setAddress, zone } = useCartStore();
+  const { deliveryType, setDelivery, address, setAddress, references, setReferences, zone } = useCartStore();
 
   return (
     <section className="rounded-xl border border-warm-100 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
       <h3 className="font-semibold">Entrega</h3>
       <div className="mt-2 flex gap-2">
         <button onClick={() => setDelivery('pickup')} className="rounded-lg border px-3 py-2 text-sm">
-          Pickup
+          Recoger en local
         </button>
         <button onClick={() => setDelivery('delivery', zone)} className="rounded-lg border px-3 py-2 text-sm">
-          Envío
+          Envío a domicilio
         </button>
       </div>
       {deliveryType === 'delivery' ? (
@@ -23,12 +23,8 @@ export function DeliverySelector() {
             <option value="zona2">Zona 2 ($30)</option>
             <option value="zona3">Zona 3 ($40)</option>
           </select>
-          <input
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="Dirección y referencias"
-            className="w-full rounded-lg border p-2"
-          />
+          <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Dirección" className="w-full rounded-lg border p-2" />
+          <input value={references} onChange={(e) => setReferences(e.target.value)} placeholder="Referencias" className="w-full rounded-lg border p-2" />
         </div>
       ) : null}
     </section>

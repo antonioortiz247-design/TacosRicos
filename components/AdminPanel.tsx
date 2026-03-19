@@ -4,16 +4,16 @@ type Metrics = {
   sales: number;
   orders: number;
   avgTicket: number;
-  topProduct: string;
+  topProducts: string;
 };
 
 export function AdminPanel({ metrics }: { metrics: Metrics }) {
   return (
     <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <Card label="Ventas" value={`$${metrics.sales}`} />
-      <Card label="Pedidos" value={`${metrics.orders}`} />
+      <Card label="Ventas del día" value={`$${metrics.sales}`} />
+      <Card label="Total de pedidos" value={`${metrics.orders}`} />
       <Card label="Ticket promedio" value={`$${metrics.avgTicket}`} />
-      <Card label="Más vendido" value={metrics.topProduct} />
+      <Card label="Más vendidos" value={metrics.topProducts} />
     </section>
   );
 }

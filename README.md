@@ -1,42 +1,52 @@
 # Tacos Ricos PWA
 
-PWA mobile-first para taquerías con menú digital, carrito, delivery, pagos, eventos privados y panel admin.
+PWA mobile-first para taquería con pedidos por WhatsApp, personalización de tacos, delivery, pagos y panel del dueño.
 
 ## Stack
 
-- Next.js 14 App Router
+- Next.js 14 (App Router)
 - Tailwind CSS
-- Supabase
-- Zustand
+- Supabase (DB + Auth + Realtime)
 - next-pwa
 
-## Rutas
+## Rutas principales
 
 - `/{negocio}/menu`
+- `/{negocio}/eventos`
 - `/admin/dashboard`
 - `/admin/orders`
 - `/admin/menu`
 - `/admin/settings`
 
-## Desarrollo
+## Instalación
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
-## Producción (Vercel)
+## Variables de entorno
 
-1. Configurar variables de entorno de `.env.example`.
-2. Crear tablas con `supabase/schema.sql`.
-3. Deploy en Vercel con framework Next.js.
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `MERCADO_PAGO_ACCESS_TOKEN`
+- `NEXT_PUBLIC_WA_PHONE`
 
-## Funciones incluidas
+## Deploy en Vercel
 
+1. Crear proyecto en Vercel.
+2. Cargar variables de entorno.
+3. Ejecutar SQL de `supabase/schema.sql`.
+4. Deploy.
+
+## Entregable
+
+- Menú exacto por secciones solicitadas.
 - Personalización de tacos con precio dinámico.
-- Delivery por zonas y pedido mínimo configurable.
-- Enlace de pedido por WhatsApp.
-- Evento privado por WhatsApp.
-- Webhook de pagos (Mercado Pago / Stripe mapping de estado).
-- Estructura SaaS multi-negocio (`businesses`, `products`, `orders`).
-- Base PWA (`manifest.json`, Service Worker con `next-pwa`).
+- Carrito sin pedido mínimo.
+- Delivery por zonas con dirección y referencias.
+- Pago con efectivo, transferencia y tarjeta (Mercado Pago).
+- Dashboard dueño y panel de pedidos.
+- PWA instalable con `manifest` + `next-pwa`.

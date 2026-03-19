@@ -8,7 +8,7 @@ create table if not exists businesses (
 create table if not exists products (
   id uuid primary key default gen_random_uuid(),
   business_id uuid references businesses(id) on delete cascade,
-  category text not null check (category in ('tacos','especialidades','promociones')),
+  category text not null check (category in ('tacos','especialidades','viernes','miercoles','jueves')),
   name text not null,
   price numeric(10,2) not null,
   image_url text,
@@ -19,10 +19,12 @@ create table if not exists products (
 create table if not exists orders (
   id uuid primary key default gen_random_uuid(),
   business_id uuid references businesses(id),
+  user_id uuid,
   items jsonb not null,
   total numeric(10,2) not null,
   delivery_type text not null,
   address text,
+  references text,
   payment_method text not null,
   payment_status text not null default 'pending',
   status text not null default 'pending',
@@ -48,8 +50,8 @@ create table if not exists settings (
   id uuid primary key default gen_random_uuid(),
   business_id uuid references businesses(id) unique,
   horarios jsonb,
-  delivery jsonb,
-  minimos jsonb,
+  zonas_envio jsonb,
+  whatsapp_number text,
   created_at timestamptz default now()
 );
 
