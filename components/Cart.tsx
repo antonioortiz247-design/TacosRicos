@@ -10,8 +10,8 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
   const searchParams = useSearchParams();
 
   const [isCreatingPayment, setIsCreatingPayment] = useState(false);
-  const [paymentId, setPaymentId] = useState('');
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'failed'>('pending');
+  const [paymentError, setPaymentError] = useState('');
 
   const subtotal = getSubtotal();
   const total = getTotal();
@@ -26,7 +26,6 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
     const collectionStatus = searchParams.get('collection_status') || searchParams.get('status') || '';
 
     if (paymentIdFromUrl) {
-      setPaymentId(paymentIdFromUrl);
       void confirmCardPayment(paymentIdFromUrl);
       return;
     }
@@ -55,7 +54,14 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
   const link = getWhatsAppLink(waPhone, message);
 
   const startCardPayment = async () => {
+    if (total <= 0 || items.length === 0) {
+      setPaymentError('Agrega productos al carrito antes de pagar.');
+      return;
+    }
+
     setIsCreatingPayment(true);
+    setPaymentError('');
+
     try {
       const origin = window.location.origin;
       const response = await fetch('/api/payments/create-preference', {
@@ -72,33 +78,41 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
       });
 
       const data = await response.json();
-      if (!response.ok || !data.init_point) throw new Error('No se pudo iniciar pago en Mercado Pago');
+      if (!response.ok) {
+        const details = typeof data?.error === 'string' ? data.error : JSON.stringify(data?.error ?? {});
+        throw new Error(`No se pudo crear la preferencia de pago. ${details}`);
+      }
 
-      window.location.href = data.init_point;
-    } catch {
+      const checkoutUrl = data.init_point || data.sandbox_init_point;
+      if (!checkoutUrl) throw new Error('Mercado Pago no devolvió URL de checkout.');
+
+      window.location.assign(checkoutUrl);
+    } catch (error) {
       setPaymentStatus('failed');
+      setPaymentError(error instanceof Error ? error.message : 'No se pudo abrir checkout de Mercado Pago.');
     } finally {
       setIsCreatingPayment(false);
     }
   };
 
-  const confirmCardPayment = async (idOverride?: string) => {
-    const id = idOverride || paymentId;
-    if (!id) return;
-
+  const confirmCardPayment = async (paymentId: string) => {
     const response = await fetch('/api/payments/confirm', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paymentId: id })
+      body: JSON.stringify({ paymentId })
     });
 
     const data = await response.json();
     if (!response.ok) {
       setPaymentStatus('failed');
+      setPaymentError('No se pudo confirmar el pago automáticamente.');
       return;
     }
 
     setPaymentStatus(data.payment_status);
+    if (data.payment_status !== 'paid') {
+      setPaymentError('Tu pago aún no está aprobado en Mercado Pago.');
+    }
   };
 
   return (
@@ -140,21 +154,11 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
           >
             {isCreatingPayment ? 'Abriendo checkout...' : 'Pagar con tarjeta'}
           </button>
-          <div className="flex gap-2">
-            <input
-              value={paymentId}
-              onChange={(event) => setPaymentId(event.target.value)}
-              placeholder="ID de pago"
-              className="w-full rounded-lg border p-2 text-sm"
-            />
-            <button onClick={() => void confirmCardPayment()} className="rounded-lg border px-3 text-sm">
-              Confirmar
-            </button>
-          </div>
           <p className="text-xs">
             Estado de pago: <b>{paymentStatus}</b>
           </p>
           {paymentStatus === 'paid' ? <p className="text-xs text-emerald-600">Pago confirmado. Ya puedes enviar tu pedido por WhatsApp.</p> : null}
+          {paymentError ? <p className="text-xs text-red-600">{paymentError}</p> : null}
         </div>
       ) : null}
 
@@ -164,7 +168,7 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
       >
         Enviar por WhatsApp
       </a>
-      {isCardPayment && paymentStatus !== 'paid' ? <p className="text-xs text-amber-600">Primero completa/confirmar el pago con tarjeta.</p> : null}
+      {isCardPayment && paymentStatus !== 'paid' ? <p className="text-xs text-amber-600">Primero completa el pago con tarjeta.</p> : null}
     </aside>
   );
 }
