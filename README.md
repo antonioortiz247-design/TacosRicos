@@ -28,6 +28,8 @@ npm run dev
 
 ## Variables de entorno
 
+> Seguridad: **no** subas tus keys reales al repositorio. Cárgalas solo en `.env.local` y en variables de entorno de Vercel.
+
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
