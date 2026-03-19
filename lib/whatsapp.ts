@@ -10,6 +10,7 @@ export function buildWhatsAppOrderMessage(params: {
   address?: string;
   references?: string;
   paymentMethod: string;
+  paymentStatus?: 'pending' | 'paid' | 'failed';
 }): string {
   const lines = [
     `Pedido para ${params.businessName}`,
@@ -25,6 +26,7 @@ export function buildWhatsAppOrderMessage(params: {
     params.address ? `Dirección: ${params.address}` : '',
     params.references ? `Referencias: ${params.references}` : '',
     `Pago: ${params.paymentMethod}`,
+    params.paymentStatus ? `Estado de pago: ${params.paymentStatus}` : '',
     `Subtotal: $${params.subtotal}`,
     `Envío: $${params.deliveryFee}`,
     `Total: $${params.total}`
