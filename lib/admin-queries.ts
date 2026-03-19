@@ -1,9 +1,20 @@
-import { supabase } from './supabase';
+import { getSupabaseClient } from './supabase';
 
 export const SALES_QUERY_SQL = 'SELECT SUM(total) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
 export const ORDERS_QUERY_SQL = 'SELECT COUNT(*) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
 
 export async function getOwnerDashboardMetrics(businessId: string) {
+  const supabase = getSupabaseClient();
+  if (!supabase) {
+    return {
+      sales: 0,
+      orders: 0,
+      avgTicket: 0,
+      topProducts: 'Sin datos',
+      recentOrders: [] as Array<{ id: string; total: number; status: string }>
+    };
+  }
+
   const today = new Date().toISOString().slice(0, 10);
 
   const [salesResult, ordersResult, topResult, recentResult] = await Promise.all([
