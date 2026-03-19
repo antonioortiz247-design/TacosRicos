@@ -1,11 +1,14 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { buildWhatsAppOrderMessage, getWhatsAppLink } from '@/lib/whatsapp';
 import { useCartStore } from '@/store/cart-store';
 
 export function Cart({ waPhone, businessName }: { waPhone: string; businessName: string }) {
   const { items, removeItem, getSubtotal, getTotal, getDeliveryFee, deliveryType, address, references, paymentMethod } = useCartStore();
+  const searchParams = useSearchParams();
+
   const [isCreatingPayment, setIsCreatingPayment] = useState(false);
   const [paymentId, setPaymentId] = useState('');
   const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'failed'>('pending');
@@ -15,6 +18,22 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
   const deliveryFee = getDeliveryFee();
   const isCardPayment = paymentMethod === 'card';
   const canSendToWhatsApp = !isCardPayment || paymentStatus === 'paid';
+
+  useEffect(() => {
+    if (!isCardPayment) return;
+
+    const paymentIdFromUrl = searchParams.get('payment_id') || searchParams.get('collection_id') || '';
+    const collectionStatus = searchParams.get('collection_status') || searchParams.get('status') || '';
+
+    if (paymentIdFromUrl) {
+      setPaymentId(paymentIdFromUrl);
+      void confirmCardPayment(paymentIdFromUrl);
+      return;
+    }
+
+    if (collectionStatus === 'approved') setPaymentStatus('paid');
+    if (collectionStatus === 'rejected') setPaymentStatus('failed');
+  }, [isCardPayment, searchParams]);
 
   const message = useMemo(
     () =>
@@ -63,13 +82,14 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
     }
   };
 
-  const confirmCardPayment = async () => {
-    if (!paymentId) return;
+  const confirmCardPayment = async (idOverride?: string) => {
+    const id = idOverride || paymentId;
+    if (!id) return;
 
     const response = await fetch('/api/payments/confirm', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paymentId })
+      body: JSON.stringify({ paymentId: id })
     });
 
     const data = await response.json();
@@ -118,7 +138,7 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
             disabled={isCreatingPayment}
             className="w-full rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
           >
-            {isCreatingPayment ? 'Abriendo pago...' : 'Pagar con tarjeta'}
+            {isCreatingPayment ? 'Abriendo checkout...' : 'Pagar con tarjeta'}
           </button>
           <div className="flex gap-2">
             <input
@@ -127,11 +147,14 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
               placeholder="ID de pago"
               className="w-full rounded-lg border p-2 text-sm"
             />
-            <button onClick={confirmCardPayment} className="rounded-lg border px-3 text-sm">
+            <button onClick={() => void confirmCardPayment()} className="rounded-lg border px-3 text-sm">
               Confirmar
             </button>
           </div>
-          <p className="text-xs">Estado de pago: <b>{paymentStatus}</b></p>
+          <p className="text-xs">
+            Estado de pago: <b>{paymentStatus}</b>
+          </p>
+          {paymentStatus === 'paid' ? <p className="text-xs text-emerald-600">Pago confirmado. Ya puedes enviar tu pedido por WhatsApp.</p> : null}
         </div>
       ) : null}
 
@@ -141,7 +164,7 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
       >
         Enviar por WhatsApp
       </a>
-      {isCardPayment && paymentStatus !== 'paid' ? <p className="text-xs text-amber-600">Confirma el pago antes de enviar por WhatsApp.</p> : null}
+      {isCardPayment && paymentStatus !== 'paid' ? <p className="text-xs text-amber-600">Primero completa/confirmar el pago con tarjeta.</p> : null}
     </aside>
   );
 }
