@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-warm-50 text-zinc-900 antialiased;
+}
+
+.dark body {
+  @apply bg-zinc-900 text-zinc-100;
+}
