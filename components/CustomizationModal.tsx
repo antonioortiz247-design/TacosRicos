@@ -17,7 +17,7 @@ export function CustomizationModal({
   const [extras, setExtras] = useState<TacoConfig['extras']>([]);
   const [notes, setNotes] = useState('');
 
-  const unitPrice = useMemo(() => calculateTacoPrice({ tortilla, extras, notes }), [tortilla, extras, notes]);
+  const unitPrice = useMemo(() => calculateTacoPrice({ tortilla, extras, notes }, product.price), [extras, notes, product.price, tortilla]);
 
   return (
     <div className="fixed inset-0 z-30 grid place-items-end bg-black/30 p-2">
