@@ -36,5 +36,5 @@ export function buildWhatsAppOrderMessage(params: {
 }
 
 export function getWhatsAppLink(phone: string, message: string): string {
-  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${5586495622}?text=${encodeURIComponent(message)}`;
 }
