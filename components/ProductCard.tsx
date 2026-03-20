@@ -13,6 +13,13 @@ export function ProductCard({
 }) {
   return (
     <article className="rounded-2xl border border-warm-100 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="mb-3 overflow-hidden rounded-xl border border-warm-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800">
+        {product.imageUrl ? (
+          <img src={product.imageUrl} alt={product.name} className="h-40 w-full object-cover" />
+        ) : (
+          <div className="grid h-40 place-items-center text-xs text-zinc-500">Imagen del producto</div>
+        )}
+      </div>
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="font-semibold">{product.name}</h3>
