@@ -17,7 +17,7 @@ export function buildWhatsAppOrderMessage(params: {
     '',
     ...params.items.map((item, idx) => {
       const config = item.config
-        ? `${item.config.tortilla}, ${item.config.extras.join(', ') || 'sin extras'}${item.config.protein ? `, ${item.config.protein}` : ''}${item.config.notes ? `, nota: ${item.config.notes}` : ''}`
+        ? `${item.config.protein ? item.config.protein : `${item.config.tortilla}, ${item.config.extras.join(', ') || 'sin extras'}`}${item.config.notes ? `, nota: ${item.config.notes}` : ''}`
         : 'estándar';
       return `${idx + 1}. ${item.productName} x${item.quantity} - $${item.subtotal} (${config})`;
     }),

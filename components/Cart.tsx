@@ -55,8 +55,9 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
               <p className="font-medium">{item.productName}</p>
               {item.config ? (
                 <p className="text-zinc-500">
-                  {item.config.tortilla} · {item.config.extras.join(', ') || 'sin extras'}
-                  {item.config.protein ? ` · ${item.config.protein}` : ''}
+                  {item.config.protein
+                    ? item.config.protein
+                    : `${item.config.tortilla} · ${item.config.extras.join(', ') || 'sin extras'}`}
                 </p>
               ) : (
                 <p className="text-zinc-500">Producto estándar</p>
