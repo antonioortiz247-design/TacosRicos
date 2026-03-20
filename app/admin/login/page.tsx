@@ -30,7 +30,10 @@ export default async function AdminLoginPage({ searchParams }: { searchParams: {
   return (
     <main className="mx-auto grid min-h-screen max-w-md place-items-center p-4">
       <section className="w-full rounded-2xl border bg-white p-6 shadow-sm dark:bg-zinc-900">
-        <h1 className="text-xl font-bold text-warm-700">Ingreso admin</h1>
+        <div className="mb-3 flex items-center gap-3">
+          <img src="/logotacosricos.png" alt="Logo Tacos Ricos" className="h-12 w-12 rounded-full border border-warm-200 object-cover" />
+          <h1 className="text-xl font-bold text-warm-700">Ingreso admin</h1>
+        </div>
         <p className="mt-1 text-sm text-zinc-500">Inicia sesión para abrir el dashboard del dueño.</p>
 
         <form action={loginAction} className="mt-4 space-y-3">
