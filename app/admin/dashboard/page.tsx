@@ -1,17 +1,8 @@
-import { redirect } from 'next/navigation';
 import { AdminPanel } from '@/components/AdminPanel';
 import { Header } from '@/components/Header';
 import { getOwnerDashboardMetrics, ORDERS_QUERY_SQL, SALES_QUERY_SQL } from '@/lib/admin-queries';
-import { getSupabaseClient } from '@/lib/supabase';
 
 export default async function DashboardPage() {
-  const supabase = getSupabaseClient();
-
-  if (supabase) {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) redirect('/demo/menu');
-  }
-
   const businessId = 'demo';
   const metrics = await getOwnerDashboardMetrics(businessId);
 
