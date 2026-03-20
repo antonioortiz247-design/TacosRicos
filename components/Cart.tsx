@@ -1,11 +1,20 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { buildWhatsAppOrderMessage, getWhatsAppLink } from '@/lib/whatsapp';
 import { useCartStore } from '@/store/cart-store';
 
+const OPENING_MINUTE = 9 * 60 + 30; // 09:30
+const CLOSING_MINUTE = 15 * 60; // 15:00
+
+function isWithinOrderSchedule(date: Date): boolean {
+  const minutes = date.getHours() * 60 + date.getMinutes();
+  return minutes >= OPENING_MINUTE && minutes <= CLOSING_MINUTE;
+}
+
 export function Cart({ waPhone, businessName }: { waPhone: string; businessName: string }) {
   const { items, removeItem, getSubtotal, getTotal, getDeliveryFee, deliveryType, address, references, paymentMethod } = useCartStore();
+  const [isOrderTime, setIsOrderTime] = useState(true);
 
   const subtotal = getSubtotal();
   const total = getTotal();
@@ -28,6 +37,13 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
   );
 
   const link = getWhatsAppLink(waPhone, message);
+
+  useEffect(() => {
+    const updateSchedule = () => setIsOrderTime(isWithinOrderSchedule(new Date()));
+    updateSchedule();
+    const intervalId = window.setInterval(updateSchedule, 60_000);
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   return (
     <aside className="space-y-3 rounded-xl border border-warm-100 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
@@ -59,11 +75,12 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
       </div>
 
       <a
-        href={link}
-        className="block rounded-lg bg-green-600 px-3 py-2 text-center text-sm font-semibold text-white"
+        href={isOrderTime ? link : '#'}
+        className={`block rounded-lg px-3 py-2 text-center text-sm font-semibold text-white ${isOrderTime ? 'bg-green-600' : 'bg-zinc-400'}`}
       >
         Enviar por WhatsApp
       </a>
+      {!isOrderTime ? <p className="text-xs text-amber-600">Los pedidos solo están disponibles de 9:30 a 15:00 horas.</p> : null}
     </aside>
   );
 }

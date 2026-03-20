@@ -47,7 +47,6 @@ export default function BusinessMenuPage({ params }: { params: { negocio: string
       <Header
         title={`Taquería ${params.negocio}`}
         subtitle="Pide en segundos"
-        isOpen
         eventHref={`/${params.negocio}/eventos`}
         dashboardHref="/admin/dashboard"
       />

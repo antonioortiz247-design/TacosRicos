@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useMemo } from 'react';
 
 type HeaderProps = {
   title: string;
@@ -10,7 +11,17 @@ type HeaderProps = {
   dashboardHref?: string;
 };
 
-export function Header({ title, subtitle, isOpen = true, eventHref, dashboardHref }: HeaderProps) {
+const OPENING_MINUTE = 9 * 60 + 30; // 09:30
+const CLOSING_MINUTE = 15 * 60; // 15:00
+
+function isWithinOrderSchedule(date: Date): boolean {
+  const minutes = date.getHours() * 60 + date.getMinutes();
+  return minutes >= OPENING_MINUTE && minutes <= CLOSING_MINUTE;
+}
+
+export function Header({ title, subtitle, isOpen, eventHref, dashboardHref }: HeaderProps) {
+  const openNow = useMemo(() => (typeof isOpen === 'boolean' ? isOpen : isWithinOrderSchedule(new Date())), [isOpen]);
+
   return (
     <header className="sticky top-0 z-20 border-b border-warm-100 bg-white/95 p-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/95">
       <div className="flex items-center justify-between gap-3">
@@ -19,8 +30,8 @@ export function Header({ title, subtitle, isOpen = true, eventHref, dashboardHre
           {subtitle ? <p className="text-sm text-zinc-500 dark:text-zinc-400">{subtitle}</p> : null}
         </div>
         <div className="flex flex-col items-end gap-2">
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${isOpen ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
-            {isOpen ? 'Abierto' : 'Cerrado'}
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${openNow ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+            {openNow ? 'Abierto' : 'Cerrado'}
           </span>
           {eventHref ? (
             <Link href={eventHref} className="rounded-lg border border-warm-300 px-3 py-1 text-xs font-semibold text-warm-700">
