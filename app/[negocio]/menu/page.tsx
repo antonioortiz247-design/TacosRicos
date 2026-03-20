@@ -44,7 +44,13 @@ const fallbackProducts: Product[] = [
 export default function BusinessMenuPage({ params }: { params: { negocio: string } }) {
   return (
     <main className="mx-auto min-h-screen max-w-6xl pb-24">
-      <Header title={`Taquería ${params.negocio}`} subtitle="Pide en segundos" isOpen eventHref={`/${params.negocio}/eventos`} />
+      <Header
+        title={`Taquería ${params.negocio}`}
+        subtitle="Pide en segundos"
+        isOpen
+        eventHref={`/${params.negocio}/eventos`}
+        dashboardHref="/admin/dashboard"
+      />
       <section className="grid gap-4 p-4 md:grid-cols-[2fr_1fr]">
         <MenuList products={fallbackProducts} />
         <div className="space-y-4">
