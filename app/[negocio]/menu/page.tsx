@@ -22,7 +22,7 @@ const fallbackProducts: Product[] = [
     businessId: 'demo',
     category: 'tacos' as const,
     name,
-    price: 30,
+    price: 32,
     active: true,
     customizable: true
   })),
