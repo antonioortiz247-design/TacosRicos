@@ -20,6 +20,7 @@ export type Product = {
 export type TacoConfig = {
   tortilla: 'maiz' | 'harina';
   extras: Array<'queso' | 'papas'>;
+  protein?: string;
   notes?: string;
 };
 

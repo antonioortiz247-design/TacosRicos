@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react';
 import { calculateTacoPrice } from '@/lib/pricing';
 import { Product, TacoConfig } from '@/lib/types';
 
+const proteinOptions = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile relleno', 'Campechano', 'Chorizo argentino', 'Chuleta'];
+
 export function CustomizationModal({
   product,
   onClose,
@@ -15,7 +17,9 @@ export function CustomizationModal({
 }) {
   const [tortilla, setTortilla] = useState<TacoConfig['tortilla']>('maiz');
   const [extras, setExtras] = useState<TacoConfig['extras']>([]);
+  const [protein, setProtein] = useState(proteinOptions[0]);
   const [notes, setNotes] = useState('');
+  const canSelectProtein = product.category === 'especialidades' && (product.name === 'Burrito' || product.name === 'Gringas');
 
   const unitPrice = useMemo(() => calculateTacoPrice({ tortilla, extras, notes }, product.price), [extras, notes, product.price, tortilla]);
 
@@ -54,6 +58,22 @@ export function CustomizationModal({
               ))}
             </div>
           </div>
+          {canSelectProtein ? (
+            <div>
+              <label className="font-semibold">Ingrediente</label>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {proteinOptions.map((item) => (
+                  <button
+                    key={item}
+                    onClick={() => setProtein(item)}
+                    className={`rounded-lg border px-3 py-1 ${protein === item ? 'border-warm-500 bg-warm-100' : 'border-zinc-300'}`}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -68,7 +88,7 @@ export function CustomizationModal({
               Cerrar
             </button>
             <button
-              onClick={() => onConfirm({ tortilla, extras, notes }, unitPrice)}
+              onClick={() => onConfirm({ tortilla, extras, protein: canSelectProtein ? protein : undefined, notes }, unitPrice)}
               className="rounded-lg bg-warm-500 px-3 py-2 text-sm font-semibold text-white"
             >
               Agregar
