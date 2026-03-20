@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    const role = request.headers.get('x-role');
-    if (role !== 'admin') {
+  const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+    const adminSession = request.cookies.get('admin_session')?.value;
+    if (adminSession !== '1') {
       return NextResponse.redirect(new URL('/demo/menu', request.url));
     }
   }

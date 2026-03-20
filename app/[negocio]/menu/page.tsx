@@ -48,7 +48,7 @@ export default function BusinessMenuPage({ params }: { params: { negocio: string
         title={`Taquería ${params.negocio}`}
         subtitle="Pide en segundos"
         eventHref={`/${params.negocio}/eventos`}
-        dashboardHref="/admin/dashboard"
+        dashboardHref="/admin/login"
       />
       <section className="grid gap-4 p-4 md:grid-cols-[2fr_1fr]">
         <MenuList products={fallbackProducts} />
