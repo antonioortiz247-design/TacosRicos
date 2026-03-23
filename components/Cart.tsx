@@ -46,41 +46,49 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
   }, []);
 
   return (
-    <aside className="space-y-3 rounded-xl border border-warm-100 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-      <h3 className="font-semibold">Carrito</h3>
-      <ul className="space-y-2 text-sm">
+    <aside className="surface-card space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="section-title">Carrito</h3>
+        <span className="pill bg-amber-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-200">{items.length} items</span>
+      </div>
+
+      <ul className="max-h-72 space-y-2 overflow-auto pr-1 text-sm">
         {items.map((item) => (
-          <li key={item.id} className="flex items-center justify-between rounded-lg border p-2">
-            <div>
-              <p className="font-medium">{item.productName}</p>
-              {item.config ? (
-                <p className="text-zinc-500">
-                  {item.config.protein
-                    ? item.config.protein
-                    : `${item.config.tortilla} · ${item.config.extras.join(', ') || 'sin extras'}`}
-                </p>
-              ) : (
-                <p className="text-zinc-500">Producto estándar</p>
-              )}
-            </div>
-            <div className="text-right">
-              <p>${item.subtotal}</p>
-              <button className="text-xs text-red-500" onClick={() => removeItem(item.id)}>
-                Eliminar
-              </button>
+          <li key={item.id} className="rounded-xl border border-slate-200 bg-white/60 p-2.5 dark:border-slate-700 dark:bg-slate-900">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="font-medium text-slate-800 dark:text-slate-100">{item.productName}</p>
+                {item.config ? (
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {item.config.protein
+                      ? item.config.protein
+                      : `${item.config.tortilla} · ${item.config.extras.join(', ') || 'sin extras'}`}
+                  </p>
+                ) : (
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Producto estándar</p>
+                )}
+              </div>
+              <div className="text-right">
+                <p className="font-semibold text-slate-700 dark:text-slate-200">${item.subtotal}</p>
+                <button className="text-xs text-rose-600 transition hover:text-rose-700" onClick={() => removeItem(item.id)}>
+                  Eliminar
+                </button>
+              </div>
             </div>
           </li>
         ))}
       </ul>
-      <div className="rounded-lg bg-zinc-50 p-2 text-sm dark:bg-zinc-800">
-        <p>Subtotal: ${subtotal}</p>
-        <p>Envío: ${deliveryFee}</p>
-        <p className="font-bold">Total: ${total}</p>
+
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-800/80">
+        <p className="flex justify-between"><span>Subtotal:</span><span>${subtotal}</span></p>
+        <p className="flex justify-between"><span>Envío:</span><span>${deliveryFee}</span></p>
+        <p className="mt-1 flex justify-between text-base font-bold text-slate-900 dark:text-slate-100"><span>Total:</span><span>${total}</span></p>
       </div>
 
       <a
         href={isOrderTime ? link : '#'}
-        className={`block rounded-lg px-3 py-2 text-center text-sm font-semibold text-white ${isOrderTime ? 'bg-green-600' : 'bg-zinc-400'}`}
+        aria-disabled={!isOrderTime}
+        className={`primary-btn w-full ${isOrderTime ? '' : 'pointer-events-none bg-slate-400 hover:bg-slate-400'}`}
       >
         Enviar por WhatsApp
       </a>
