@@ -10,19 +10,19 @@ const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relle
 
 // Reemplaza "archivo.ext" por el nombre real de archivo (ej: pechuga.jpg o productos/pechuga.jpg).
 const PRODUCT_IMAGE_FILE_NAMES: Partial<Record<string, string>> = {
-  Barriga: 'archivo.ext',
-  Suadero: 'archivo.ext',
+  Barriga: 'TacodePechuga.png',
+  Suadero: 'TacodeSuadero.png',
   Pechuga: 'TacodePechuga.png',
-  Longaniza: 'archivo.ext',
-  'Chile Relleno': 'archivo.ext',
-  Campechanos: 'archivo.ext',
-  'Chorizo Argentino': 'archivo.ext',
-  Chuleta: 'archivo.ext',
-  Burrito: 'archivo.ext',
-  Gringas: 'archivo.ext',
-  'Quesadillas de camarón': 'archivo.ext',
-  'Papas rellenas': 'archivo.ext',
-  'Pescado rebozado': 'archivo.ext'
+  Longaniza: 'TacodeSuadero.png',
+  'Chile Relleno': 'TacodePechuga.png',
+  Campechanos: 'TacodeSuadero.png',
+  'Chorizo Argentino': 'TacodePechuga.pngt',
+  Chuleta: 'TacodeSuadero.png',
+  Burrito: 'TacodePechuga.png',
+  Gringas: 'TacodeSuadero.png',
+  'Quesadillas de camarón': 'TacodePechuga.png',
+  'Papas rellenas': 'TacodeSuadero.png',
+  'Pescado rebozado': 'TacodePechuga.png'
 };
 
 function getProductImageUrl(productName: string): string | undefined {
