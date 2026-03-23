@@ -1,14 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type HeaderProps = {
   title: string;
   subtitle?: string;
   isOpen?: boolean;
   eventHref?: string;
-  dashboardHref?: string;
+};
+
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 };
 
 const OPENING_MINUTE = 9 * 60 + 30; // 09:30
@@ -19,43 +23,64 @@ function isWithinOrderSchedule(date: Date): boolean {
   return minutes >= OPENING_MINUTE && minutes <= CLOSING_MINUTE;
 }
 
-export function Header({ title, subtitle, isOpen, eventHref, dashboardHref }: HeaderProps) {
+export function Header({ title, subtitle, isOpen, eventHref }: HeaderProps) {
   const openNow = useMemo(() => (typeof isOpen === 'boolean' ? isOpen : isWithinOrderSchedule(new Date())), [isOpen]);
   const [logoError, setLogoError] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+
+  useEffect(() => {
+    const onBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setDeferredPrompt(event as BeforeInstallPromptEvent);
+    };
+
+    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) {
+      window.alert('Para instalar la app abre el menú del navegador y selecciona "Agregar a pantalla de inicio".');
+      return;
+    }
+
+    await deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    setDeferredPrompt(null);
+  };
 
   return (
-    <header className="sticky top-0 z-20 border-b border-warm-100 bg-white/95 p-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/95">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 px-4 py-3 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-950/85">
+      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3">
           {!logoError ? (
             <img
               src="/logotacosricos.png"
               alt="Logo Tacos Ricos"
-              className="h-11 w-11 rounded-full border border-warm-200 object-cover"
+              className="h-12 w-12 rounded-2xl border border-slate-200 object-cover shadow-sm dark:border-slate-700"
               onError={() => setLogoError(true)}
             />
           ) : (
-            <div className="grid h-11 w-11 place-items-center rounded-full border border-warm-200 bg-warm-50 text-xs font-bold text-warm-700">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl border border-slate-200 bg-amber-100 text-sm font-bold text-orange-700 dark:border-zinc-700 dark:bg-orange-500/15 dark:text-orange-200">
               TR
             </div>
           )}
-          <div>
-            <h1 className="text-xl font-bold text-warm-700 dark:text-warm-100">{title}</h1>
-            {subtitle ? <p className="text-sm text-zinc-500 dark:text-zinc-400">{subtitle}</p> : null}
+          <div className="min-w-0">
+            <h1 className="truncate text-lg font-bold tracking-tight text-slate-900 sm:text-2xl dark:text-slate-100">{title}</h1>
+            {subtitle ? <p className="truncate text-sm text-slate-500 dark:text-slate-400">{subtitle}</p> : null}
           </div>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${openNow ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <span className={`pill ${openNow ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300'}`}>
             {openNow ? 'Abierto' : 'Cerrado'}
           </span>
+          <button onClick={handleInstallClick} className="primary-btn px-3 py-1.5 text-xs sm:text-sm">
+            Descargar App
+          </button>
           {eventHref ? (
-            <Link href={eventHref} className="rounded-lg border border-warm-300 px-3 py-1 text-xs font-semibold text-warm-700">
-              Reservar evento 🎉
-            </Link>
-          ) : null}
-          {dashboardHref ? (
-            <Link href={dashboardHref} className="rounded-lg bg-zinc-900 px-3 py-1 text-xs font-semibold text-white dark:bg-warm-500">
-              Dashboard dueño
+            <Link href={eventHref} className="secondary-btn px-3 py-1.5 text-xs sm:text-sm">
+              Reservar evento
             </Link>
           ) : null}
         </div>
