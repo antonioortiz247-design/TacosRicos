@@ -33,10 +33,12 @@ const fallbackProducts: Product[] = [
 ];
 
 export default function BusinessMenuPage({ params }: { params: { negocio: string } }) {
+  const businessDisplayName = params.negocio.toLowerCase() === "demo" ? "Tacos Rico´s" : `Taquería ${params.negocio}`;
+
   return (
     <main className="mx-auto min-h-screen max-w-6xl pb-24">
       <Header
-        title={`Taquería ${params.negocio}`}
+        title={businessDisplayName}
         subtitle="Pide en segundos"
         eventHref={`/${params.negocio}/eventos`}
         dashboardHref="/admin/login"
@@ -54,7 +56,7 @@ export default function BusinessMenuPage({ params }: { params: { negocio: string
         <div className="space-y-4 md:sticky md:top-[92px] md:self-start">
           <DeliverySelector />
           <PaymentSelector />
-          <Cart waPhone="5215512345678" businessName={params.negocio} />
+          <Cart waPhone="5215512345678" businessName={businessDisplayName} />
         </div>
       </section>
     </main>
