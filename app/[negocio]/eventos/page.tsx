@@ -1,4 +1,5 @@
 import { EventForm } from '@/components/EventForm';
+import { FooterActions } from '@/components/FooterActions';
 import { Header } from '@/components/Header';
 
 export default function EventosPage({ params }: { params: { negocio: string } }) {
@@ -14,6 +15,8 @@ export default function EventosPage({ params }: { params: { negocio: string } })
         </div>
         <EventForm waPhone="5215512345678" />
       </section>
+
+      <FooterActions dashboardHref="/admin/login" />
     </main>
   );
 }

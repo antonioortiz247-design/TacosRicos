@@ -8,7 +8,6 @@ type HeaderProps = {
   subtitle?: string;
   isOpen?: boolean;
   eventHref?: string;
-  dashboardHref?: string;
 };
 
 const OPENING_MINUTE = 9 * 60 + 30; // 09:30
@@ -19,7 +18,7 @@ function isWithinOrderSchedule(date: Date): boolean {
   return minutes >= OPENING_MINUTE && minutes <= CLOSING_MINUTE;
 }
 
-export function Header({ title, subtitle, isOpen, eventHref, dashboardHref }: HeaderProps) {
+export function Header({ title, subtitle, isOpen, eventHref }: HeaderProps) {
   const openNow = useMemo(() => (typeof isOpen === 'boolean' ? isOpen : isWithinOrderSchedule(new Date())), [isOpen]);
   const [logoError, setLogoError] = useState(false);
 
@@ -52,11 +51,6 @@ export function Header({ title, subtitle, isOpen, eventHref, dashboardHref }: He
           {eventHref ? (
             <Link href={eventHref} className="secondary-btn px-3 py-1.5 text-xs sm:text-sm">
               Reservar evento
-            </Link>
-          ) : null}
-          {dashboardHref ? (
-            <Link href={dashboardHref} className="primary-btn px-3 py-1.5 text-xs sm:text-sm">
-              Dashboard dueño
             </Link>
           ) : null}
         </div>

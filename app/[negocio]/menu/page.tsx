@@ -1,5 +1,6 @@
 import { Cart } from '@/components/Cart';
 import { DeliverySelector } from '@/components/DeliverySelector';
+import { FooterActions } from '@/components/FooterActions';
 import { Header } from '@/components/Header';
 import { MenuList } from '@/components/MenuList';
 import { PaymentSelector } from '@/components/PaymentSelector';
@@ -33,16 +34,11 @@ const fallbackProducts: Product[] = [
 ];
 
 export default function BusinessMenuPage({ params }: { params: { negocio: string } }) {
-  const businessDisplayName = params.negocio.toLowerCase() === "demo" ? "Tacos Rico´s" : `Taquería ${params.negocio}`;
+  const businessDisplayName = params.negocio.toLowerCase() === 'demo' ? 'Tacos Rico´s' : `Taquería ${params.negocio}`;
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl pb-24">
-      <Header
-        title={businessDisplayName}
-        subtitle="Pide en segundos"
-        eventHref={`/${params.negocio}/eventos`}
-        dashboardHref="/admin/login"
-      />
+      <Header title={businessDisplayName} subtitle="Pide en segundos" eventHref={`/${params.negocio}/eventos`} />
 
       <section className="grid gap-4 p-4 md:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] md:gap-5 md:p-6">
         <div className="space-y-3">
@@ -59,6 +55,8 @@ export default function BusinessMenuPage({ params }: { params: { negocio: string
           <Cart waPhone="5215512345678" businessName={businessDisplayName} />
         </div>
       </section>
+
+      <FooterActions dashboardHref="/admin/login" />
     </main>
   );
 }
