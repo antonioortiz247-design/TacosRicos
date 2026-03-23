@@ -12,15 +12,18 @@ const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relle
 const IMAGE_BASE_PATH = '/productos';
 
 // Solo cambia los valores por el nombre real de tu archivo: "archivo.ext"
+const IMAGE_BASE_PATH = '/productos';
+
+// Solo cambia los valores por el nombre real de tu archivo: "archivo.ext"
 const productImageFileNames: Partial<Record<string, string>> = {
-  Barriga: 'TacodeBarriga.png',
+  Barriga: 'archivo.ext',
   Suadero: 'TacodeSuadero.png',
   Pechuga: 'TacodePechuga.png',
-  Longaniza: 'TacodeLonganiza.png',
-  Chile Relleno: 'TacodeChile.png',
-  Campechanos: 'TacoCampechano.png',
-  Chorizo Argentino: 'logotacosricos.png',
-  Chuleta: 'TacodeSuadero.png'
+  Longaniza: 'archivo.ext',
+  'Chile Relleno': 'archivo.ext',
+  Campechanos: 'archivo.ext',
+  'Chorizo Argentino': 'archivo.ext',
+  Chuleta: 'archivo.ext'
 };
 
 function getProductImageUrl(productName: string): string | undefined {
