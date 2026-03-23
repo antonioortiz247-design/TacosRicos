@@ -1,13 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type HeaderProps = {
   title: string;
   subtitle?: string;
   isOpen?: boolean;
   eventHref?: string;
+};
+
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 };
 
 const OPENING_MINUTE = 9 * 60 + 30; // 09:30
@@ -21,6 +26,28 @@ function isWithinOrderSchedule(date: Date): boolean {
 export function Header({ title, subtitle, isOpen, eventHref }: HeaderProps) {
   const openNow = useMemo(() => (typeof isOpen === 'boolean' ? isOpen : isWithinOrderSchedule(new Date())), [isOpen]);
   const [logoError, setLogoError] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+
+  useEffect(() => {
+    const onBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setDeferredPrompt(event as BeforeInstallPromptEvent);
+    };
+
+    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) {
+      window.alert('Para instalar la app abre el menú del navegador y selecciona "Agregar a pantalla de inicio".');
+      return;
+    }
+
+    await deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    setDeferredPrompt(null);
+  };
 
   return (
     <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 px-4 py-3 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-950/85">
@@ -48,6 +75,9 @@ export function Header({ title, subtitle, isOpen, eventHref }: HeaderProps) {
           <span className={`pill ${openNow ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300'}`}>
             {openNow ? 'Abierto' : 'Cerrado'}
           </span>
+          <button onClick={handleInstallClick} className="primary-btn px-3 py-1.5 text-xs sm:text-sm">
+            Descargar App
+          </button>
           {eventHref ? (
             <Link href={eventHref} className="secondary-btn px-3 py-1.5 text-xs sm:text-sm">
               Reservar evento

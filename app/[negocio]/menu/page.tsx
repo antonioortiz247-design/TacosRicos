@@ -16,8 +16,8 @@ const fallbackProducts: Product[] = [
     name,
     price: 32,
     active: true,
-    customizable: true
-    imageUrl: '/public/TacodePechuga.jpg'
+    customizable: true,
+    imageUrl: name === 'Pechuga' ? '/logotacosricos.png' : undefined
   })),
   { id: 'e-1', businessId: 'demo', category: 'especialidades', name: 'Burrito', price: 100, active: true, customizable: true },
   { id: 'e-2', businessId: 'demo', category: 'especialidades', name: 'Gringas', price: 70, active: true, customizable: true },
