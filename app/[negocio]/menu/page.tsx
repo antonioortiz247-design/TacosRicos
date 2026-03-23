@@ -10,20 +10,25 @@ const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relle
 
 const IMAGE_BASE_PATH = '/productos';
 
-// Solo cambia los valores por el nombre real de tu archivo: "archivo.ext"
-const productImageFileNames: Partial<Record<string, string>> = {
-  Barriga: 'TacodeSuadero.png',
-  Suadero: 'TacodeSuadero.png',
-  Pechuga: 'TacodePechuga.png',
-  Longaniza: 'TacodeSuadero.png',
-  'Chile Relleno': 'TacodeSuadero.png',
-  Campechanos: 'TacodeSuadero.png',
-  'Chorizo Argentino': 'TacodeSuadero.png',
-  Chuleta: 'TacodeSuadero.png'
+// Reemplaza "archivo.ext" por el nombre de archivo real de cada imagen.
+const PRODUCT_IMAGE_FILE_NAMES: Partial<Record<string, string>> = {
+  Barriga: 'archivo.ext',
+  Suadero: 'archivo.ext',
+  Pechuga: 'archivo.ext',
+  Longaniza: 'archivo.ext',
+  'Chile Relleno': 'archivo.ext',
+  Campechanos: 'archivo.ext',
+  'Chorizo Argentino': 'archivo.ext',
+  Chuleta: 'archivo.ext',
+  Burrito: 'archivo.ext',
+  Gringas: 'archivo.ext',
+  'Quesadillas de camarón': 'archivo.ext',
+  'Papas rellenas': 'archivo.ext',
+  'Pescado rebozado': 'archivo.ext'
 };
 
 function getProductImageUrl(productName: string): string | undefined {
-  const fileName = productImageFileNames[productName];
+  const fileName = PRODUCT_IMAGE_FILE_NAMES[productName];
   return fileName ? `${IMAGE_BASE_PATH}/${fileName}` : undefined;
 }
 
@@ -36,12 +41,46 @@ const fallbackProducts: Product[] = [
     price: 32,
     active: true,
     customizable: true,
-    imageUrl: getProductImageUrl(name),
+    imageUrl: getProductImageUrl(name)
   })),
-  { id: 'e-1', businessId: 'demo', category: 'especialidades', name: 'Burrito', price: 100, active: true, customizable: true },
-  { id: 'e-2', businessId: 'demo', category: 'especialidades', name: 'Gringas', price: 70, active: true, customizable: true },
-  { id: 'v-1', businessId: 'demo', category: 'viernes', name: 'Quesadillas de camarón', price: 40, active: true },
-  { id: 'm-1', businessId: 'demo', category: 'miercoles', name: 'Papas rellenas', price: 90, active: true },
+  {
+    id: 'e-1',
+    businessId: 'demo',
+    category: 'especialidades',
+    name: 'Burrito',
+    price: 100,
+    active: true,
+    customizable: true,
+    imageUrl: getProductImageUrl('Burrito')
+  },
+  {
+    id: 'e-2',
+    businessId: 'demo',
+    category: 'especialidades',
+    name: 'Gringas',
+    price: 70,
+    active: true,
+    customizable: true,
+    imageUrl: getProductImageUrl('Gringas')
+  },
+  {
+    id: 'v-1',
+    businessId: 'demo',
+    category: 'viernes',
+    name: 'Quesadillas de camarón',
+    price: 40,
+    active: true,
+    imageUrl: getProductImageUrl('Quesadillas de camarón')
+  },
+  {
+    id: 'm-1',
+    businessId: 'demo',
+    category: 'miercoles',
+    name: 'Papas rellenas',
+    price: 90,
+    active: true,
+    imageUrl: getProductImageUrl('Papas rellenas')
+  },
   {
     id: 'j-1',
     businessId: 'demo',
@@ -50,7 +89,8 @@ const fallbackProducts: Product[] = [
     price: 120,
     description: 'Precio editable en admin',
     active: true,
-  },
+    imageUrl: getProductImageUrl('Pescado rebozado')
+  }
 ];
 
 export default function BusinessMenuPage({ params }: { params: { negocio: string } }) {
