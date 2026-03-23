@@ -8,7 +8,7 @@ import { Product } from '@/lib/types';
 
 const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relleno', 'Campechanos', 'Chorizo Argentino', 'Chuleta'];
 
-const IMAGE_BASE_PATH = '/productos';
+const IMAGE_BASE_PATH = '/public';
 
 // Reemplaza "archivo.ext" por el nombre de archivo real de cada imagen.
 const PRODUCT_IMAGE_FILE_NAMES: Partial<Record<string, string>> = {
