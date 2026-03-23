@@ -17,7 +17,8 @@ const fallbackProducts: Product[] = [
     price: 32,
     active: true,
     customizable: true,
-    imageUrl: name === 'Pechuga' ? '/logotacosricos.png' : undefined
+    // Ojo: en Next.js las rutas públicas van como '/archivo.ext', no 'public/archivo.ext'.
+    imageUrl: name === 'Pechuga' ? '/logotacosricos.png' : undefined,
   })),
   { id: 'e-1', businessId: 'demo', category: 'especialidades', name: 'Burrito', price: 100, active: true, customizable: true },
   { id: 'e-2', businessId: 'demo', category: 'especialidades', name: 'Gringas', price: 70, active: true, customizable: true },
@@ -30,9 +31,8 @@ const fallbackProducts: Product[] = [
     name: 'Pescado rebozado',
     price: 120,
     description: 'Precio editable en admin',
-    active: true
-    imageUrl: 'public/TacodePechuga.jpg'
-  }
+    active: true,
+  },
 ];
 
 export default function BusinessMenuPage({ params }: { params: { negocio: string } }) {
