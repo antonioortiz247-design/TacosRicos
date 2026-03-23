@@ -17,6 +17,7 @@ const fallbackProducts: Product[] = [
     price: 32,
     active: true,
     customizable: true
+    imageUrl: '/public/TacodePechuga.jpg'
   })),
   { id: 'e-1', businessId: 'demo', category: 'especialidades', name: 'Burrito', price: 100, active: true, customizable: true },
   { id: 'e-2', businessId: 'demo', category: 'especialidades', name: 'Gringas', price: 70, active: true, customizable: true },
@@ -30,6 +31,7 @@ const fallbackProducts: Product[] = [
     price: 120,
     description: 'Precio editable en admin',
     active: true
+    imageUrl: 'public/TacodePechuga.jpg'
   }
 ];
 
