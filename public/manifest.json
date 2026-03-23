@@ -7,7 +7,7 @@
   "background_color": "#fff8ef",
   "theme_color": "#f97316",
   "icons": [
-    { "src": "/icons/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" },
-    { "src": "/icons/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml" }
+    { "src": "/logotacosricos.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/logotacosricos.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
