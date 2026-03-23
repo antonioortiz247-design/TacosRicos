@@ -1,20 +1,36 @@
 import { Cart } from '@/components/Cart';
 import { DeliverySelector } from '@/components/DeliverySelector';
+import { FooterActions } from '@/components/FooterActions';
 import { Header } from '@/components/Header';
 import { MenuList } from '@/components/MenuList';
 import { PaymentSelector } from '@/components/PaymentSelector';
 import { Product } from '@/lib/types';
 
-const baseProducts = [
-  'Barriga',
-  'Suadero',
-  'Pechuga',
-  'Longaniza',
-  'Chile Relleno',
-  'Campechanos',
-  'Chorizo Argentino',
-  'Chuleta'
-];
+const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relleno', 'Campechanos', 'Chorizo Argentino', 'Chuleta'];
+
+const IMAGE_BASE_PATH = '/productos';
+
+// Reemplaza "archivo.ext" por el nombre de archivo real de cada imagen.
+const PRODUCT_IMAGE_FILE_NAMES: Partial<Record<string, string>> = {
+  Barriga: 'archivo.ext',
+  Suadero: 'archivo.ext',
+  Pechuga: 'archivo.ext',
+  Longaniza: 'archivo.ext',
+  'Chile Relleno': 'archivo.ext',
+  Campechanos: 'archivo.ext',
+  'Chorizo Argentino': 'archivo.ext',
+  Chuleta: 'archivo.ext',
+  Burrito: 'archivo.ext',
+  Gringas: 'archivo.ext',
+  'Quesadillas de camarón': 'archivo.ext',
+  'Papas rellenas': 'archivo.ext',
+  'Pescado rebozado': 'archivo.ext'
+};
+
+function getProductImageUrl(productName: string): string | undefined {
+  const fileName = PRODUCT_IMAGE_FILE_NAMES[productName];
+  return fileName ? `${IMAGE_BASE_PATH}/${fileName}` : undefined;
+}
 
 const fallbackProducts: Product[] = [
   ...baseProducts.map((name, idx) => ({
@@ -24,12 +40,47 @@ const fallbackProducts: Product[] = [
     name,
     price: 32,
     active: true,
-    customizable: true
+    customizable: true,
+    imageUrl: getProductImageUrl(name)
   })),
-  { id: 'e-1', businessId: 'demo', category: 'especialidades', name: 'Burrito', price: 100, active: true, customizable: true },
-  { id: 'e-2', businessId: 'demo', category: 'especialidades', name: 'Gringas', price: 70, active: true, customizable: true },
-  { id: 'v-1', businessId: 'demo', category: 'viernes', name: 'Quesadillas de camarón', price: 40, active: true },
-  { id: 'm-1', businessId: 'demo', category: 'miercoles', name: 'Papas rellenas', price: 90, active: true },
+  {
+    id: 'e-1',
+    businessId: 'demo',
+    category: 'especialidades',
+    name: 'Burrito',
+    price: 100,
+    active: true,
+    customizable: true,
+    imageUrl: getProductImageUrl('Burrito')
+  },
+  {
+    id: 'e-2',
+    businessId: 'demo',
+    category: 'especialidades',
+    name: 'Gringas',
+    price: 70,
+    active: true,
+    customizable: true,
+    imageUrl: getProductImageUrl('Gringas')
+  },
+  {
+    id: 'v-1',
+    businessId: 'demo',
+    category: 'viernes',
+    name: 'Quesadillas de camarón',
+    price: 40,
+    active: true,
+    imageUrl: getProductImageUrl('Quesadillas de camarón')
+  },
+  {
+    id: 'm-1',
+    businessId: 'demo',
+    category: 'miercoles',
+    name: 'Papas rellenas',
+    price: 90,
+    active: true,
+    imageUrl: getProductImageUrl('Papas rellenas')
+  },
   {
     id: 'j-1',
     businessId: 'demo',
@@ -37,27 +88,35 @@ const fallbackProducts: Product[] = [
     name: 'Pescado rebozado',
     price: 120,
     description: 'Precio editable en admin',
-    active: true
+    active: true,
+    imageUrl: getProductImageUrl('Pescado rebozado')
   }
 ];
 
 export default function BusinessMenuPage({ params }: { params: { negocio: string } }) {
+  const businessDisplayName = params.negocio.toLowerCase() === 'demo' ? 'Tacos Rico´s' : `Taquería ${params.negocio}`;
+
   return (
     <main className="mx-auto min-h-screen max-w-6xl pb-24">
-      <Header
-        title={`Taquería ${params.negocio}`}
-        subtitle="Pide en segundos"
-        eventHref={`/${params.negocio}/eventos`}
-        dashboardHref="/admin/login"
-      />
-      <section className="grid gap-4 p-4 md:grid-cols-[2fr_1fr]">
-        <MenuList products={fallbackProducts} />
-        <div className="space-y-4">
+      <Header title={businessDisplayName} subtitle="Pide en segundos" eventHref={`/${params.negocio}/eventos`} />
+
+      <section className="grid gap-4 p-4 md:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] md:gap-5 md:p-6">
+        <div className="space-y-3">
+          <div className="surface-card p-4">
+            <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Menú del día</h2>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Selecciona tus favoritos, personaliza y confirma tu pedido en WhatsApp.</p>
+          </div>
+          <MenuList products={fallbackProducts} />
+        </div>
+
+        <div className="space-y-4 md:sticky md:top-[92px] md:self-start">
           <DeliverySelector />
           <PaymentSelector />
-          <Cart waPhone="5215512345678" businessName={params.negocio} />
+          <Cart waPhone="5215512345678" businessName={businessDisplayName} />
         </div>
       </section>
+
+      <FooterActions dashboardHref="/admin/login" />
     </main>
   );
 }

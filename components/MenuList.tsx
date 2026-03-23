@@ -26,28 +26,35 @@ export function MenuList({ products }: { products: Product[] }) {
 
   return (
     <div className="space-y-6">
-      {byCategory.map((group) => (
-        <section key={group.key} className="space-y-3">
-          <h2 className="text-lg font-bold">{group.label}</h2>
-          {group.items.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onCustomize={setSelected}
-              onAdd={(item) =>
-                addItem({
-                  id: crypto.randomUUID(),
-                  productId: item.id,
-                  productName: item.name,
-                  quantity: 1,
-                  unitPrice: item.price,
-                  subtotal: item.price
-                })
-              }
-            />
-          ))}
-        </section>
-      ))}
+      {byCategory.map((group) =>
+        group.items.length ? (
+          <section key={group.key} className="space-y-3">
+            <div className="flex items-center gap-2">
+              <h2 className="section-title text-lg sm:text-xl">{group.label}</h2>
+              <span className="pill bg-amber-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-200">{group.items.length}</span>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+              {group.items.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onCustomize={setSelected}
+                  onAdd={(item) =>
+                    addItem({
+                      id: crypto.randomUUID(),
+                      productId: item.id,
+                      productName: item.name,
+                      quantity: 1,
+                      unitPrice: item.price,
+                      subtotal: item.price
+                    })
+                  }
+                />
+              ))}
+            </div>
+          </section>
+        ) : null
+      )}
 
       {selected ? (
         <CustomizationModal
