@@ -8,10 +8,6 @@ import { Product } from '@/lib/types';
 
 const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relleno', 'Campechanos', 'Chorizo Argentino', 'Chuleta'];
 
-
-const IMAGE_BASE_PATH = '/productos';
-
-// Solo cambia los valores por el nombre real de tu archivo: "archivo.ext"
 const IMAGE_BASE_PATH = '/productos';
 
 // Solo cambia los valores por el nombre real de tu archivo: "archivo.ext"
