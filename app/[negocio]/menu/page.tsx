@@ -31,6 +31,7 @@ const fallbackProducts: Product[] = [
     price: 120,
     description: 'Precio editable en admin',
     active: true
+    imageUrl: 'public/TacodePechuga.jpg'
   }
 ];
 
