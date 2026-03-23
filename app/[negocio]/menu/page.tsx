@@ -12,7 +12,7 @@ const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relle
 const PRODUCT_IMAGE_FILE_NAMES: Partial<Record<string, string>> = {
   Barriga: 'archivo.ext',
   Suadero: 'archivo.ext',
-  Pechuga: 'archivo.ext',
+  Pechuga: 'TacodePechuga.png',
   Longaniza: 'archivo.ext',
   'Chile Relleno': 'archivo.ext',
   Campechanos: 'archivo.ext',
