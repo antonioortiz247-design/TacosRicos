@@ -13,7 +13,7 @@ const IMAGE_BASE_PATH = '/productos';
 // Reemplaza "archivo.ext" por el nombre de archivo real de cada imagen.
 const PRODUCT_IMAGE_FILE_NAMES: Partial<Record<string, string>> = {
   Barriga: 'archivo.ext',
-  Suadero: 'archivo.ext',
+  Suadero: '/TacodeSuadero.png',
   Pechuga: 'archivo.ext',
   Longaniza: 'archivo.ext',
   'Chile Relleno': 'archivo.ext',
