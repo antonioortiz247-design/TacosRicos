@@ -7,7 +7,7 @@
   "background_color": "#fff8ef",
   "theme_color": "#f97316",
   "icons": [
-    { "src": "/TacodePechuga.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/logotacosricos.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/logotacosricos.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
