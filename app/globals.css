@@ -8,7 +8,7 @@
 
 body {
   @apply min-h-screen bg-amber-50 text-zinc-900 antialiased;
-  background-image: radial-gradient(circle at top, rgba(220, 38, 38, 0.38), rgba(250, 204, 21, 0.18) 42%, transparent 70%);
+  background-image: radial-gradient(circle at top, rgba(249, 115, 22, 0.2), transparent 48%);
 }
 
 .dark body {
