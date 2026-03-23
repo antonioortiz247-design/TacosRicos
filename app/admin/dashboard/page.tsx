@@ -9,7 +9,7 @@ export default async function DashboardPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl p-4">
-      <Header title="Admin · Dashboard dueño" subtitle="Ventas y rendimiento del día" />
+      <Header title="Admin · Dashboard" subtitle="Ventas y rendimiento del día" />
       <div className="mt-4 space-y-4">
         <AdminPanel metrics={metrics} />
         <AdminLiveQueriesPanel />
