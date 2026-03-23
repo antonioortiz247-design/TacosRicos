@@ -19,18 +19,7 @@ const fallbackProducts: Product[] = [
     customizable: true,
     // Ojo: en Next.js las rutas públicas van como '/archivo.ext', no 'public/archivo.ext'.
     imageUrl: name === 'Pechuga' ? '/TacodePechuga.png' : undefined,
-  })),
-  const fallbackProducts: Product[] = [
-  ...baseProducts.map((name, idx) => ({
-    id: `t-${idx + 1}`,
-    businessId: 'demo',
-    category: 'tacos' as const,
-    name,
-    price: 32,
-    active: true,
-    customizable: true,
-    // Ojo: en Next.js las rutas públicas van como '/archivo.ext', no 'public/archivo.ext'.
-    imageUrl: name === 'Suadero' ? '/TacodeSuadero.png' : undefined,
+    imageUrl: nombre === 'Suadero' ? '/TacodeSuadero.png' : undefined,
   })),
   { id: 'e-1', businessId: 'demo', category: 'especialidades', name: 'Burrito', price: 100, active: true, customizable: true },
   { id: 'e-2', businessId: 'demo', category: 'especialidades', name: 'Gringas', price: 70, active: true, customizable: true },
