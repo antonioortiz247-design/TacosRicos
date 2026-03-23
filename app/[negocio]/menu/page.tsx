@@ -13,14 +13,14 @@ const IMAGE_BASE_PATH = '/productos';
 
 // Solo cambia los valores por el nombre real de tu archivo: "archivo.ext"
 const productImageFileNames: Partial<Record<string, string>> = {
-  Barriga: 'archivo.ext',
-  Suadero: 'archivo.ext',
-  Pechuga: 'archivo.ext',
-  Longaniza: 'archivo.ext',
-  'Chile Relleno': 'archivo.ext',
-  Campechanos: 'archivo.ext',
-  'Chorizo Argentino': 'archivo.ext',
-  Chuleta: 'archivo.ext'
+  Barriga: 'TacodeBarriga.png',
+  Suadero: 'TacodeSuadero.png',
+  Pechuga: 'TacodePechuga.png',
+  Longaniza: 'TacodeLonganiza.png',
+  Chile Relleno: 'TacodeChile.png',
+  Campechanos: 'TacoCampechano.png',
+  Chorizo Argentino: 'logotacosricos.png',
+  Chuleta: 'TacodeSuadero.png'
 };
 
 function getProductImageUrl(productName: string): string | undefined {
@@ -39,7 +39,7 @@ const fallbackProducts: Product[] = [
     customizable: true,
     imageUrl: getProductImageUrl(name),
   })),
-  { id: 'e-1', businessId: 'demo', category: 'especialidades', name: 'Burrito', price: 100, active: true, customizable: true },
+  { id: 'e-1', businessId: 'demo', category: 'especialidades', name: 'Burrito', price: 100, active: true, customizable: true, imageUrl: nombre === 'Suadero' ? '/TacodeSuadero.png' : undefined, },
   { id: 'e-2', businessId: 'demo', category: 'especialidades', name: 'Gringas', price: 70, active: true, customizable: true },
   { id: 'v-1', businessId: 'demo', category: 'viernes', name: 'Quesadillas de camarón', price: 40, active: true },
   { id: 'm-1', businessId: 'demo', category: 'miercoles', name: 'Papas rellenas', price: 90, active: true },
