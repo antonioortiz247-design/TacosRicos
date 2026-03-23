@@ -8,13 +8,12 @@ import { Product } from '@/lib/types';
 
 const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relleno', 'Campechanos', 'Chorizo Argentino', 'Chuleta'];
 
-
-// Reemplaza "archivo.ext" por el nombre de archivo real de cada imagen.
+// Reemplaza "archivo.ext" por el nombre real de archivo (ej: pechuga.jpg o productos/pechuga.jpg).
 const PRODUCT_IMAGE_FILE_NAMES: Partial<Record<string, string>> = {
-  Barriga: 'TacodePechuga.png',
-  Suadero: 'logotacosricos.png',
-  Pechuga: 'public/TacodePechuga.png',
-  Longaniza: 'TacodeSuadero.png',
+  Barriga: 'archivo.ext',
+  Suadero: 'archivo.ext',
+  Pechuga: 'archivo.ext',
+  Longaniza: 'archivo.ext',
   'Chile Relleno': 'archivo.ext',
   Campechanos: 'archivo.ext',
   'Chorizo Argentino': 'archivo.ext',
@@ -27,8 +26,13 @@ const PRODUCT_IMAGE_FILE_NAMES: Partial<Record<string, string>> = {
 };
 
 function getProductImageUrl(productName: string): string | undefined {
-  const fileName = PRODUCT_IMAGE_FILE_NAMES[productName];
-  return fileName ? `${IMAGE_BASE_PATH}/${fileName}` : undefined;
+  const fileName = PRODUCT_IMAGE_FILE_NAMES[productName]?.trim();
+
+  if (!fileName || fileName === 'archivo.ext') {
+    return undefined;
+  }
+
+  return fileName.startsWith('/') ? fileName : `/${fileName}`;
 }
 
 const fallbackProducts: Product[] = [
