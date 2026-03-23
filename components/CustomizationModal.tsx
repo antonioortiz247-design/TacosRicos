@@ -25,36 +25,39 @@ export function CustomizationModal({
   const unitPrice = useMemo(() => calculateTacoPrice({ tortilla, extras, notes }, product.price), [extras, notes, product.price, tortilla]);
 
   return (
-    <div className="fixed inset-0 z-30 grid place-items-end bg-black/30 p-2">
-      <div className="w-full max-w-md rounded-2xl bg-white p-4 dark:bg-zinc-900">
-        <h2 className="text-lg font-bold">{product.name}</h2>
-        <div className="mt-3 space-y-3 text-sm">
+    <div className="fixed inset-0 z-30 grid place-items-end bg-slate-950/50 p-2 sm:place-items-center">
+      <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl dark:border-slate-800 dark:bg-slate-900">
+        <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">{product.name}</h2>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Personaliza tu pedido y agrega notas si lo necesitas.</p>
+
+        <div className="mt-4 space-y-4 text-sm">
           {canSelectTacoOptions ? (
             <>
               <div>
-                <label className="font-semibold">Tortilla</label>
-                <div className="mt-1 flex gap-2">
+                <label className="font-semibold text-slate-700 dark:text-slate-200">Tortilla</label>
+                <div className="mt-2 flex gap-2">
                   {(['maiz', 'harina'] as const).map((item) => (
                     <button
                       key={item}
                       onClick={() => setTortilla(item)}
-                      className={`rounded-lg border px-3 py-1 ${tortilla === item ? 'border-warm-500 bg-warm-100' : 'border-zinc-300'}`}
+                      className={`secondary-btn px-3 py-1.5 capitalize ${tortilla === item ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
                     >
                       {item}
                     </button>
                   ))}
                 </div>
               </div>
+
               <div>
-                <label className="font-semibold">Extras</label>
-                <div className="mt-1 flex gap-2">
+                <label className="font-semibold text-slate-700 dark:text-slate-200">Extras</label>
+                <div className="mt-2 flex gap-2">
                   {(['queso', 'papas'] as const).map((extra) => (
                     <button
                       key={extra}
                       onClick={() =>
                         setExtras((prev) => (prev.includes(extra) ? prev.filter((item) => item !== extra) : [...prev, extra]))
                       }
-                      className={`rounded-lg border px-3 py-1 ${extras.includes(extra) ? 'border-warm-500 bg-warm-100' : 'border-zinc-300'}`}
+                      className={`secondary-btn px-3 py-1.5 capitalize ${extras.includes(extra) ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
                     >
                       {extra}
                     </button>
@@ -63,15 +66,16 @@ export function CustomizationModal({
               </div>
             </>
           ) : null}
+
           {canSelectProtein ? (
             <div>
-              <label className="font-semibold">Ingrediente</label>
-              <div className="mt-1 flex flex-wrap gap-2">
+              <label className="font-semibold text-slate-700 dark:text-slate-200">Ingrediente</label>
+              <div className="mt-2 flex flex-wrap gap-2">
                 {proteinOptions.map((item) => (
                   <button
                     key={item}
                     onClick={() => setProtein(item)}
-                    className={`rounded-lg border px-3 py-1 ${protein === item ? 'border-warm-500 bg-warm-100' : 'border-zinc-300'}`}
+                    className={`secondary-btn px-3 py-1.5 ${protein === item ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
                   >
                     {item}
                   </button>
@@ -79,17 +83,14 @@ export function CustomizationModal({
               </div>
             </div>
           ) : null}
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Notas"
-            className="w-full rounded-lg border border-zinc-300 p-2"
-          />
+
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notas" className="input-field min-h-24 resize-none" />
         </div>
-        <div className="mt-4 flex items-center justify-between">
-          <span className="font-bold text-warm-700">${unitPrice}</span>
-          <div className="space-x-2">
-            <button onClick={onClose} className="rounded-lg border px-3 py-2 text-sm">
+
+        <div className="mt-5 flex items-center justify-between gap-2">
+          <span className="text-lg font-bold text-orange-700 dark:text-amber-200">${unitPrice}</span>
+          <div className="flex items-center gap-2">
+            <button onClick={onClose} className="secondary-btn px-3 py-2 text-sm">
               Cerrar
             </button>
             <button
@@ -104,7 +105,7 @@ export function CustomizationModal({
                   unitPrice
                 )
               }
-              className="rounded-lg bg-warm-500 px-3 py-2 text-sm font-semibold text-white"
+              className="primary-btn px-3 py-2 text-sm"
             >
               Agregar
             </button>
