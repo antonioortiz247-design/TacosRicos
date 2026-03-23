@@ -16,7 +16,7 @@ const PRODUCT_IMAGE_FILE_NAMES: Partial<Record<string, string>> = {
   Longaniza: 'TacodeSuadero.png',
   'Chile Relleno': 'TacodePechuga.png',
   Campechanos: 'TacodeSuadero.png',
-  'Chorizo Argentino': 'TacodePechuga.pngt',
+  'Chorizo Argentino': 'TacodePechuga.png',
   Chuleta: 'TacodeSuadero.png',
   Burrito: 'TacodePechuga.png',
   Gringas: 'TacodeSuadero.png',
