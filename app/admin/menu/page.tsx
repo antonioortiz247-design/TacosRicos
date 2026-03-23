@@ -3,7 +3,7 @@ import { Header } from '@/components/Header';
 const rows = [
   { name: 'Burrito', price: 100, active: true },
   { name: 'Gringas', price: 70, active: true },
-  { name: 'Pescado rebozado', price: 120, active: true }
+  { name: 'Pescado rebozado', price: 40, active: true }
 ];
 
 export default function MenuAdminPage() {
