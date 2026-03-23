@@ -14,7 +14,7 @@ const IMAGE_BASE_PATH = '/productos';
 const PRODUCT_IMAGE_FILE_NAMES: Partial<Record<string, string>> = {
   Barriga: 'archivo.ext',
   Suadero: '/TacodeSuadero.png',
-  Pechuga: 'archivo.ext',
+  Pechuga: 'public/TacodePechuga.png',
   Longaniza: 'archivo.ext',
   'Chile Relleno': 'archivo.ext',
   Campechanos: 'archivo.ext',
