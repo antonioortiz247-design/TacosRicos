@@ -20,7 +20,7 @@ const fallbackProducts: Product[] = [
     // Ojo: en Next.js las rutas públicas van como '/archivo.ext', no 'public/archivo.ext'.
     imageUrl: name === 'Pechuga' ? '/TacodePechuga.png' : undefined,
     imageUrl: name === 'Suadero' ? '/TacodePechuga.png' : undefined,
-    imageUrl: name === 'Longaniza' ? '/TacodePechuga.png' : undefined,
+    imageUrl: name === 'Longaniza' ? '/logotacosricos.png' : undefined,
   })),
   { id: 'e-1', businessId: 'demo', category: 'especialidades', name: 'Burrito', price: 100, active: true, customizable: true },
   { id: 'e-2', businessId: 'demo', category: 'especialidades', name: 'Gringas', price: 70, active: true, customizable: true },
