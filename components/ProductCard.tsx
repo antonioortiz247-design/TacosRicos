@@ -29,7 +29,7 @@ export function ProductCard({
         <div className="min-w-0">
           <h3 className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">{product.name}</h3>
           {product.description ? <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{product.description}</p> : null}
-          <p className="mt-3 text-lg font-bold tracking-tight text-blue-700 dark:text-blue-300">${product.price}</p>
+          <p className="mt-3 text-lg font-bold tracking-tight text-orange-700 dark:text-amber-200">${product.price}</p>
         </div>
         {product.customizable ? (
           <button onClick={() => onCustomize(product)} className="primary-btn shrink-0 px-3 py-2 text-xs sm:text-sm">

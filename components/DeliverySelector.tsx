@@ -11,13 +11,13 @@ export function DeliverySelector() {
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <button
           onClick={() => setDelivery('pickup')}
-          className={`secondary-btn w-full ${deliveryType === 'pickup' ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-500/40 dark:bg-blue-500/10 dark:text-blue-200' : ''}`}
+          className={`secondary-btn w-full ${deliveryType === 'pickup' ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
         >
           Recoger en local
         </button>
         <button
           onClick={() => setDelivery('delivery', zone)}
-          className={`secondary-btn w-full ${deliveryType === 'delivery' ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-500/40 dark:bg-blue-500/10 dark:text-blue-200' : ''}`}
+          className={`secondary-btn w-full ${deliveryType === 'delivery' ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
         >
           Envío a domicilio
         </button>

@@ -40,7 +40,7 @@ export function CustomizationModal({
                     <button
                       key={item}
                       onClick={() => setTortilla(item)}
-                      className={`secondary-btn px-3 py-1.5 capitalize ${tortilla === item ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-500/40 dark:bg-blue-500/10 dark:text-blue-200' : ''}`}
+                      className={`secondary-btn px-3 py-1.5 capitalize ${tortilla === item ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
                     >
                       {item}
                     </button>
@@ -57,7 +57,7 @@ export function CustomizationModal({
                       onClick={() =>
                         setExtras((prev) => (prev.includes(extra) ? prev.filter((item) => item !== extra) : [...prev, extra]))
                       }
-                      className={`secondary-btn px-3 py-1.5 capitalize ${extras.includes(extra) ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-500/40 dark:bg-blue-500/10 dark:text-blue-200' : ''}`}
+                      className={`secondary-btn px-3 py-1.5 capitalize ${extras.includes(extra) ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
                     >
                       {extra}
                     </button>
@@ -75,7 +75,7 @@ export function CustomizationModal({
                   <button
                     key={item}
                     onClick={() => setProtein(item)}
-                    className={`secondary-btn px-3 py-1.5 ${protein === item ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-500/40 dark:bg-blue-500/10 dark:text-blue-200' : ''}`}
+                    className={`secondary-btn px-3 py-1.5 ${protein === item ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
                   >
                     {item}
                   </button>
@@ -88,7 +88,7 @@ export function CustomizationModal({
         </div>
 
         <div className="mt-5 flex items-center justify-between gap-2">
-          <span className="text-lg font-bold text-blue-700 dark:text-blue-300">${unitPrice}</span>
+          <span className="text-lg font-bold text-orange-700 dark:text-amber-200">${unitPrice}</span>
           <div className="flex items-center gap-2">
             <button onClick={onClose} className="secondary-btn px-3 py-2 text-sm">
               Cerrar

@@ -19,7 +19,7 @@ export function PaymentSelector() {
           <button
             key={method.value}
             onClick={() => setPaymentMethod(method.value)}
-            className={`secondary-btn w-full ${paymentMethod === method.value ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-500/40 dark:bg-blue-500/10 dark:text-blue-200' : ''}`}
+            className={`secondary-btn w-full ${paymentMethod === method.value ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
           >
             {method.label}
           </button>

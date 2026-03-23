@@ -49,7 +49,7 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
     <aside className="surface-card space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="section-title">Carrito</h3>
-        <span className="pill bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-200">{items.length} items</span>
+        <span className="pill bg-amber-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-200">{items.length} items</span>
       </div>
 
       <ul className="max-h-72 space-y-2 overflow-auto pr-1 text-sm">

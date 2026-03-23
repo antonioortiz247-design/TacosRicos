@@ -35,7 +35,7 @@ export function Header({ title, subtitle, isOpen, eventHref, dashboardHref }: He
               onError={() => setLogoError(true)}
             />
           ) : (
-            <div className="grid h-12 w-12 place-items-center rounded-2xl border border-slate-200 bg-blue-50 text-sm font-bold text-blue-700 dark:border-slate-700 dark:bg-blue-950/50 dark:text-blue-200">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl border border-slate-200 bg-amber-100 text-sm font-bold text-orange-700 dark:border-zinc-700 dark:bg-orange-500/15 dark:text-orange-200">
               TR
             </div>
           )}
