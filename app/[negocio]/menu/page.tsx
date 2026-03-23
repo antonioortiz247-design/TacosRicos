@@ -8,6 +8,26 @@ import { Product } from '@/lib/types';
 
 const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relleno', 'Campechanos', 'Chorizo Argentino', 'Chuleta'];
 
+
+const IMAGE_BASE_PATH = '/productos';
+
+// Solo cambia los valores por el nombre real de tu archivo: "archivo.ext"
+const productImageFileNames: Partial<Record<string, string>> = {
+  Barriga: 'TacodeBarriga.png',
+  Suadero: 'TacodeSuadero.png',
+  Pechuga: 'TacodePechuga.png',
+  Longaniza: 'TacodeLonganiza.png',
+  Chile Relleno: 'TacodeChile.png',
+  Campechanos: 'TacoCampechano.png',
+  Chorizo Argentino: 'logotacosricos.png',
+  Chuleta: 'TacodeSuadero.png'
+};
+
+function getProductImageUrl(productName: string): string | undefined {
+  const fileName = productImageFileNames[productName];
+  return fileName ? `${IMAGE_BASE_PATH}/${fileName}` : undefined;
+}
+
 const fallbackProducts: Product[] = [
   ...baseProducts.map((name, idx) => ({
     id: `t-${idx + 1}`,
@@ -17,9 +37,7 @@ const fallbackProducts: Product[] = [
     price: 32,
     active: true,
     customizable: true,
-    // Ojo: en Next.js las rutas públicas van como '/archivo.ext', no 'public/archivo.ext'.
-    imageUrl: name === 'Pechuga' ? '/TacodePechuga.png' : undefined,
-    imageUrl: nombre === 'Suadero' ? '/TacodeSuadero.png' : undefined,
+    imageUrl: getProductImageUrl(name),
   })),
   { id: 'e-1', businessId: 'demo', category: 'especialidades', name: 'Burrito', price: 100, active: true, customizable: true, imageUrl: nombre === 'Suadero' ? '/TacodeSuadero.png' : undefined, },
   { id: 'e-2', businessId: 'demo', category: 'especialidades', name: 'Gringas', price: 70, active: true, customizable: true },
