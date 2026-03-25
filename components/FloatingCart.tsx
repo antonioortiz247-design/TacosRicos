@@ -2,7 +2,7 @@
 
 import { useCartStore } from '@/store/cart-store';
 import { useState, useEffect } from 'react';
-import { ShoppingBag, X, ChevronRight } from 'lucide-react';
+import { ShoppingBag, X, ChevronRight, ShoppingCart } from 'lucide-react';
 
 export function FloatingCart() {
   const { items, getTotal, getSubtotal } = useCartStore();
@@ -20,64 +20,76 @@ export function FloatingCart() {
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 md:hidden">
+    <div className="fixed bottom-8 right-8 z-50">
       {/* Botón flotante principal */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-600 text-white shadow-2xl transition-transform active:scale-95 hover:bg-orange-700"
+          className="group relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-red-600 text-white shadow-soft-xl transition-all duration-300 hover:scale-110 active:scale-95"
         >
           <div className="relative">
-            <ShoppingBag size={24} />
-            <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-orange-600 shadow-sm">
+            <ShoppingBag size={28} className="transition-transform group-hover:rotate-12" />
+            <span className="absolute -right-3 -top-3 flex h-7 w-7 animate-bounce items-center justify-center rounded-full bg-zinc-900 text-[12px] font-black text-white shadow-lg border-2 border-white">
               {itemCount}
             </span>
           </div>
         </button>
       )}
 
-      {/* Mini-resumen expansible (opcional, podrías ir directo al modal/sidebar) */}
+      {/* Mini-resumen expansible con efecto glassmorphism */}
       {isOpen && (
-        <div className="surface-card w-[90vw] max-w-[320px] overflow-hidden rounded-2xl p-0 shadow-2xl animate-in fade-in zoom-in slide-in-from-bottom-4 duration-200">
-          <div className="flex items-center justify-between border-b border-zinc-100 bg-orange-50/50 px-4 py-3 dark:border-zinc-800 dark:bg-orange-900/10">
-            <h3 className="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <ShoppingBag size={18} className="text-orange-600" />
-              Tu Carrito
-            </h3>
+        <div className="glass-effect w-[90vw] max-w-[360px] overflow-hidden rounded-[2.5rem] p-0 shadow-2xl animate-in fade-in zoom-in slide-in-from-bottom-8 duration-300">
+          <div className="flex items-center justify-between border-b border-zinc-100 bg-zinc-50/80 px-6 py-5 dark:border-zinc-800 dark:bg-zinc-900/50">
+            <div>
+              <h3 className="text-lg font-black text-zinc-900 dark:text-zinc-100 flex items-center gap-2 uppercase tracking-tight">
+                <ShoppingCart size={20} className="text-orange-600" />
+                Pedido
+              </h3>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Resumen actual</p>
+            </div>
             <button 
               onClick={() => setIsOpen(false)}
-              className="rounded-full p-1 hover:bg-zinc-200 dark:hover:bg-zinc-800"
+              className="rounded-full bg-zinc-200/50 p-2 text-zinc-600 transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400"
             >
-              <X size={18} />
+              <X size={20} />
             </button>
           </div>
           
-          <div className="max-h-[40vh] overflow-y-auto px-4 py-2">
+          <div className="max-h-[35vh] overflow-y-auto px-6 py-4 space-y-4">
             {items.map((item) => (
-              <div key={item.id} className="flex justify-between py-2 text-sm">
-                <span className="text-zinc-600 dark:text-zinc-400">
-                  {item.quantity}x {item.productName}
-                </span>
-                <span className="font-medium">${item.subtotal}</span>
+              <div key={item.id} className="flex items-center justify-between group">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-100 text-xs font-black text-orange-700">
+                    {item.quantity}x
+                  </div>
+                  <span className="text-sm font-bold text-zinc-700 dark:text-zinc-300 truncate max-w-[150px]">
+                    {item.productName}
+                  </span>
+                </div>
+                <span className="text-sm font-black text-zinc-900 dark:text-zinc-100">${item.subtotal}</span>
               </div>
             ))}
           </div>
 
-          <div className="border-t border-zinc-100 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex justify-between mb-3">
-              <span className="text-sm font-medium">Total estimado</span>
-              <span className="text-lg font-bold text-orange-600">${total}</span>
+          <div className="bg-zinc-50/80 px-6 py-6 dark:bg-zinc-900/50">
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Total a pagar</p>
+                <p className="text-3xl font-black tracking-tighter text-orange-600 dark:text-orange-400">${total}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] font-bold text-zinc-400 italic">Precios con IVA</p>
+              </div>
             </div>
             <button 
               onClick={() => {
                 setIsOpen(false);
-                // Aquí podrías hacer scroll al componente Cart principal
                 document.querySelector('aside')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="primary-btn w-full flex items-center justify-center gap-2"
+              className="primary-btn w-full group shadow-orange-500/30"
             >
-              Ver detalles y pedir
-              <ChevronRight size={16} />
+              Confirmar Pedido
+              <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
             </button>
           </div>
         </div>
