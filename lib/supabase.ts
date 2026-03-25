@@ -7,13 +7,14 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 // Cliente Singleton para evitar múltiples instancias en el lado del cliente
 let supabaseInstance: SupabaseClient | null = null;
 
-export function getSupabaseClient(): SupabaseClient {
+export function getSupabaseClient(): SupabaseClient | null {
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Faltan variables de entorno de Supabase: NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY');
+    // En lugar de lanzar error, devolvemos null para no romper el build de Next.js
+    console.warn('Advertencia: Faltan variables de entorno de Supabase.');
+    return null;
   }
 
   if (typeof window === 'undefined') {
-    // En el servidor, siempre creamos una nueva instancia o manejamos según sea necesario
     return createClient(supabaseUrl, supabaseAnonKey);
   }
 
@@ -24,5 +25,5 @@ export function getSupabaseClient(): SupabaseClient {
   return supabaseInstance;
 }
 
-// Helper para obtener el cliente de forma rápida
-export const supabase = getSupabaseClient();
+// Helper para obtener el cliente de forma rápida (puede ser null)
+export const supabase = getSupabaseClient()!;

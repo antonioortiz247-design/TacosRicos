@@ -5,6 +5,7 @@ export const ORDERS_QUERY_SQL = 'SELECT COUNT(*) FROM orders WHERE DATE(created_
 
 export async function getBusinessBySlug(slug: string) {
   const supabase = getSupabaseClient();
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from('businesses')
     .select('*')
@@ -17,6 +18,7 @@ export async function getBusinessBySlug(slug: string) {
 
 export async function getBusinessProducts(businessId: string) {
   const supabase = getSupabaseClient();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from('products')
     .select('*')
