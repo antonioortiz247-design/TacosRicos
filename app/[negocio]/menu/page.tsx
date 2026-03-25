@@ -39,86 +39,24 @@ function getProductImageUrl(productName: string): string | undefined {
   return fileName.startsWith('/') ? fileName : `/${fileName}`;
 }
 
-const fallbackProducts: Product[] = [
-  ...baseProducts.map((name, idx) => ({
-    id: `t-${idx + 1}`,
-    businessId: 'demo',
-    category: 'tacos' as const,
-    name,
-    price: 32,
-    active: true,
-    customizable: true,
-    imageUrl: getProductImageUrl(name)
-  })),
-  {
-    id: 'e-1',
-    businessId: 'demo',
-    category: 'especialidades',
-    name: 'Burrito',
-    price: 100,
-    active: true,
-    customizable: true,
-    imageUrl: getProductImageUrl('Burrito')
-  },
-  {
-    id: 'e-2',
-    businessId: 'demo',
-    category: 'especialidades',
-    name: 'Gringas',
-    price: 70,
-    active: true,
-    customizable: true,
-    imageUrl: getProductImageUrl('Gringas')
-  },
-  {
-    id: 'v-1',
-    businessId: 'demo',
-    category: 'viernes',
-    name: 'Quesadillas de camarón',
-    price: 40,
-    active: true,
-    imageUrl: getProductImageUrl('Quesadillas de camarón')
-  },
-  {
-    id: 'm-1',
-    businessId: 'demo',
-    category: 'miercoles',
-    name: 'Papas rellenas',
-    price: 90,
-    active: true,
-    imageUrl: getProductImageUrl('Papas rellenas')
-  },
-  {
-    id: 'j-1',
-    businessId: 'demo',
-    category: 'jueves',
-    name: 'Pescado rebozado',
-    price: 120,
-    description: 'Precio editable en admin',
-    active: true,
-    imageUrl: getProductImageUrl('Pescado rebozado')
-  }
-];
-
 export default async function BusinessMenuPage({ params }: { params: { negocio: string } }) {
   // Intentar obtener el negocio real desde la base de datos
   const business = await getBusinessBySlug(params.negocio);
   
-  // Si no existe y no es demo, 404
-  if (!business && params.negocio.toLowerCase() !== 'demo') {
+  // Si no existe, 404
+  if (!business) {
     notFound();
   }
 
-  // Si es demo o no hay productos en DB, usar fallback
-  const dbProducts = business ? await getBusinessProducts(business.id) : [];
-  const products = dbProducts.length > 0 ? (dbProducts as any as Product[]) : fallbackProducts;
+  // Obtener productos desde la DB
+  const products = await getBusinessProducts(business.id) as any as Product[];
 
   // Obtener configuración del negocio (teléfono de WhatsApp)
-  const settings = business ? await getBusinessSettings(business.id) : null;
+  const settings = await getBusinessSettings(business.id);
   const waPhone = settings?.whatsapp_number || process.env.NEXT_PUBLIC_WA_PHONE || "5586495622";
 
-  const businessDisplayName = business ? business.name : (params.negocio.toLowerCase() === 'demo' ? 'Tacos Rico´s' : `Taquería ${params.negocio}`);
-  const businessId = business ? business.id : params.negocio;
+  const businessDisplayName = business.name;
+  const businessId = business.id;
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl pb-24">
@@ -130,7 +68,13 @@ export default async function BusinessMenuPage({ params }: { params: { negocio: 
             <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Menú del día</h2>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Selecciona tus favoritos, personaliza y confirma tu pedido en WhatsApp.</p>
           </div>
-          <MenuList products={products} />
+          {products.length > 0 ? (
+            <MenuList products={products} />
+          ) : (
+            <div className="surface-card p-12 text-center">
+              <p className="text-slate-500">No hay productos disponibles en este momento.</p>
+            </div>
+          )}
         </div>
 
         <div className="space-y-4 md:sticky md:top-[92px] md:self-start">

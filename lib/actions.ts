@@ -17,7 +17,7 @@ export async function createOrder(params: OrderInput) {
 
     let businessId = validated.businessId;
 
-    // Si el businessId no parece un UUID (ej: "demo"), intentamos buscarlo por slug
+    // Si el businessId no parece un UUID, intentamos buscarlo por slug
     const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(businessId);
     
     if (!isUUID) {
@@ -30,11 +30,7 @@ export async function createOrder(params: OrderInput) {
       if (biz) {
         businessId = biz.id;
       } else {
-        // Si no existe el negocio en la DB y es "demo", o cualquier otro, 
-        // podrías decidir qué hacer. Por ahora, si no es UUID y no se encuentra, 
-        // fallará el insert. Pero intentaremos insertar de todos modos 
-        // o lanzar un error más claro.
-        throw new Error(`El negocio "${businessId}" no está registrado en la base de datos.`);
+        throw new Error(`El negocio "${businessId}" no está registrado.`);
       }
     }
 

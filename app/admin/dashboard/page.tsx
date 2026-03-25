@@ -8,9 +8,14 @@ import { ProductPriceManager } from '@/components/ProductPriceManager';
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
-  const businessId = 'demo';
+  // En una versión final, esto vendría del perfil del usuario logueado
+  const businessId = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_ID || '';
   
   try {
+    if (!businessId) {
+      throw new Error('ID de negocio no configurado. Por favor añade NEXT_PUBLIC_DEFAULT_BUSINESS_ID a tus variables de entorno.');
+    }
+
     const metrics = await getOwnerDashboardMetrics(businessId);
 
     return (

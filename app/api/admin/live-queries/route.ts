@@ -17,10 +17,15 @@ export async function GET(request: Request) {
   }
 
   const today = new Date().toISOString().slice(0, 10);
+  const businessId = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_ID;
+
+  if (!businessId) {
+    return NextResponse.json({ ok: false, error: 'Business ID not configured' }, { status: 400 });
+  }
 
   const [salesResult, ordersResult] = await Promise.all([
-    supabase.from('orders').select('total').eq('business_id', 'demo').gte('created_at', `${today}T00:00:00`).lte('created_at', `${today}T23:59:59`),
-    supabase.from('orders').select('id', { count: 'exact', head: true }).eq('business_id', 'demo').gte('created_at', `${today}T00:00:00`).lte('created_at', `${today}T23:59:59`)
+    supabase.from('orders').select('total').eq('business_id', businessId).gte('created_at', `${today}T00:00:00`).lte('created_at', `${today}T23:59:59`),
+    supabase.from('orders').select('id', { count: 'exact', head: true }).eq('business_id', businessId).gte('created_at', `${today}T00:00:00`).lte('created_at', `${today}T23:59:59`)
   ]);
 
   if (salesResult.error || ordersResult.error) {

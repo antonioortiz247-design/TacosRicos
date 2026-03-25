@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { ArrowRight, Star, Clock, MapPin } from 'lucide-react';
 
 export default function HomePage() {
+  const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_SLUG || 'tacos-ricos';
+
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-12 lg:py-24">
       {/* Background elements */}
@@ -30,7 +32,7 @@ export default function HomePage() {
             </p>
 
             <div className="mt-10 flex flex-col gap-4 sm:flex-row lg:justify-start">
-              <Link href="/demo/menu" className="primary-btn text-lg group">
+              <Link href={`/${defaultSlug}/menu`} className="primary-btn text-lg group">
                 Explorar Menú
                 <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
               </Link>

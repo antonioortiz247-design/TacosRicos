@@ -42,6 +42,19 @@ export async function getBusinessSettings(businessId: string) {
   return data;
 }
 
+export async function getBusinessOrders(businessId: string) {
+  const supabase = getSupabaseClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('business_id', businessId)
+    .order('created_at', { ascending: false });
+  
+  if (error) return [];
+  return data;
+}
+
 export async function getOwnerDashboardMetrics(businessId: string) {
   const supabase = getSupabaseClient();
   if (!supabase) {
