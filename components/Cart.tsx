@@ -69,7 +69,7 @@ export function Cart({ waPhone, businessName, businessId }: { waPhone: string; b
         // Opcionalmente limpiamos el carrito
         // clearCart();
       } else {
-        alert('Hubo un error al procesar tu pedido. Por favor intenta de nuevo.');
+        alert(`Error: ${result.error || 'No se pudo procesar tu pedido. Por favor intenta de nuevo.'}`);
       }
     } catch (error) {
       console.error('Error handling order:', error);

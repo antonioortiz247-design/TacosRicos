@@ -5,16 +5,43 @@ import { OrderSchema, OrderInput } from './validations';
 
 export async function createOrder(params: OrderInput) {
   try {
-    const supabase = getSupabaseClient();
+    const { getSupabaseAdmin, getSupabaseClient } = await import('./supabase');
+    
+    // Intentamos usar el cliente admin para insertar el pedido (anon users)
+    const supabase = getSupabaseAdmin() || getSupabaseClient();
+    
     if (!supabase) throw new Error('No se pudo conectar con la base de datos');
 
     // Validar datos en el servidor
     const validated = OrderSchema.parse(params);
 
+    let businessId = validated.businessId;
+
+    // Si el businessId no parece un UUID (ej: "demo"), intentamos buscarlo por slug
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(businessId);
+    
+    if (!isUUID) {
+      const { data: biz } = await supabase
+        .from('businesses')
+        .select('id')
+        .eq('slug', businessId)
+        .single();
+      
+      if (biz) {
+        businessId = biz.id;
+      } else {
+        // Si no existe el negocio en la DB y es "demo", o cualquier otro, 
+        // podrías decidir qué hacer. Por ahora, si no es UUID y no se encuentra, 
+        // fallará el insert. Pero intentaremos insertar de todos modos 
+        // o lanzar un error más claro.
+        throw new Error(`El negocio "${businessId}" no está registrado en la base de datos.`);
+      }
+    }
+
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
-        business_id: validated.businessId,
+        business_id: businessId,
         items: validated.items,
         total: validated.total,
         delivery_type: validated.deliveryType,
