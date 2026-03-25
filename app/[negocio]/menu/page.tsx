@@ -115,7 +115,7 @@ export default async function BusinessMenuPage({ params }: { params: { negocio: 
 
   // Obtener configuración del negocio (teléfono de WhatsApp)
   const settings = business ? await getBusinessSettings(business.id) : null;
-  const waPhone = settings?.whatsapp_number || process.env.NEXT_PUBLIC_WA_PHONE || "5215512345678";
+  const waPhone = settings?.whatsapp_number || process.env.NEXT_PUBLIC_WA_PHONE || "5586495622";
 
   const businessDisplayName = business ? business.name : (params.negocio.toLowerCase() === 'demo' ? 'Tacos Rico´s' : `Taquería ${params.negocio}`);
   const businessId = business ? business.id : params.negocio;
