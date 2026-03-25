@@ -6,7 +6,7 @@ import { MenuList } from '@/components/MenuList';
 import { PaymentSelector } from '@/components/PaymentSelector';
 import { Product } from '@/lib/types';
 import { getBusinessBySlug, getBusinessProducts, getBusinessSettings } from '@/lib/admin-queries';
-import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,9 +43,9 @@ export default async function BusinessMenuPage({ params }: { params: { negocio: 
   // Intentar obtener el negocio real desde la base de datos
   const business = await getBusinessBySlug(params.negocio);
   
-  // Si no existe, 404
+  // Si no existe, redirigir al inicio en lugar de 404
   if (!business) {
-    notFound();
+    redirect('/');
   }
 
   // Obtener productos desde la DB
