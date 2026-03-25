@@ -41,7 +41,8 @@ export function Cart({ waPhone, businessName, businessId }: { waPhone: string; b
   const link = getWhatsAppLink(waPhone, message);
 
   useEffect(() => {
-    const updateSchedule = () => setIsOrderTime(isWithinOrderSchedule(new Date()));
+    // Forzado a true para permitir pruebas fuera de horario
+    const updateSchedule = () => setIsOrderTime(true);
     updateSchedule();
     const intervalId = window.setInterval(updateSchedule, 60_000);
     return () => window.clearInterval(intervalId);

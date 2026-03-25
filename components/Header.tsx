@@ -24,7 +24,8 @@ function isWithinOrderSchedule(date: Date): boolean {
 }
 
 export function Header({ title, subtitle, isOpen, eventHref }: HeaderProps) {
-  const openNow = useMemo(() => (typeof isOpen === 'boolean' ? isOpen : isWithinOrderSchedule(new Date())), [isOpen]);
+  // Forzado a true para pruebas fuera de horario
+  const openNow = useMemo(() => (typeof isOpen === 'boolean' ? isOpen : true), [isOpen]);
   const [logoError, setLogoError] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
