@@ -29,6 +29,19 @@ export async function getBusinessProducts(businessId: string) {
   return data;
 }
 
+export async function getBusinessSettings(businessId: string) {
+  const supabase = getSupabaseClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('settings')
+    .select('*')
+    .eq('business_id', businessId)
+    .single();
+  
+  if (error) return null;
+  return data;
+}
+
 export async function getOwnerDashboardMetrics(businessId: string) {
   const supabase = getSupabaseClient();
   if (!supabase) {

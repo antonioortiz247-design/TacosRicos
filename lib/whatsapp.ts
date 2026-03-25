@@ -36,5 +36,7 @@ export function buildWhatsAppOrderMessage(params: {
 }
 
 export function getWhatsAppLink(phone: string, message: string): string {
-  return `https://wa.me/${5586495622}?text=${encodeURIComponent(message)}`;
+  // Limpiamos el número de teléfono para que solo tenga dígitos
+  const cleanPhone = phone.replace(/\D/g, '');
+  return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 }

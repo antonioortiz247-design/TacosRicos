@@ -5,7 +5,7 @@ import { Header } from '@/components/Header';
 import { MenuList } from '@/components/MenuList';
 import { PaymentSelector } from '@/components/PaymentSelector';
 import { Product } from '@/lib/types';
-import { getBusinessBySlug, getBusinessProducts } from '@/lib/admin-queries';
+import { getBusinessBySlug, getBusinessProducts, getBusinessSettings } from '@/lib/admin-queries';
 import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -113,6 +113,10 @@ export default async function BusinessMenuPage({ params }: { params: { negocio: 
   const dbProducts = business ? await getBusinessProducts(business.id) : [];
   const products = dbProducts.length > 0 ? (dbProducts as any as Product[]) : fallbackProducts;
 
+  // Obtener configuración del negocio (teléfono de WhatsApp)
+  const settings = business ? await getBusinessSettings(business.id) : null;
+  const waPhone = settings?.whatsapp_number || process.env.NEXT_PUBLIC_WA_PHONE || "5215512345678";
+
   const businessDisplayName = business ? business.name : (params.negocio.toLowerCase() === 'demo' ? 'Tacos Rico´s' : `Taquería ${params.negocio}`);
   const businessId = business ? business.id : params.negocio;
 
@@ -132,7 +136,7 @@ export default async function BusinessMenuPage({ params }: { params: { negocio: 
         <div className="space-y-4 md:sticky md:top-[92px] md:self-start">
           <DeliverySelector />
           <PaymentSelector />
-          <Cart waPhone="5215512345678" businessName={businessDisplayName} businessId={businessId} />
+          <Cart waPhone={waPhone} businessName={businessDisplayName} businessId={businessId} />
         </div>
       </section>
 
