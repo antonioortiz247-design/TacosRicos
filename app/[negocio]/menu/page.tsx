@@ -115,7 +115,7 @@ export default function BusinessMenuPage({ params }: { params: { negocio: string
         <div className="space-y-4 md:sticky md:top-[92px] md:self-start">
           <DeliverySelector />
           <PaymentSelector />
-          <Cart waPhone="5215512345678" businessName={businessDisplayName} />
+          <Cart waPhone="5215512345678" businessName={businessDisplayName} businessId={params.negocio} />
         </div>
       </section>
 

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { buildWhatsAppOrderMessage, getWhatsAppLink } from '@/lib/whatsapp';
 import { useCartStore } from '@/store/cart-store';
+import { createOrder } from '@/lib/actions';
 
 const OPENING_MINUTE = 9 * 60 + 30; // 09:30
 const CLOSING_MINUTE = 15 * 60; // 15:00
@@ -12,9 +13,10 @@ function isWithinOrderSchedule(date: Date): boolean {
   return minutes >= OPENING_MINUTE && minutes <= CLOSING_MINUTE;
 }
 
-export function Cart({ waPhone, businessName }: { waPhone: string; businessName: string }) {
-  const { items, removeItem, getSubtotal, getTotal, getDeliveryFee, deliveryType, address, references, paymentMethod } = useCartStore();
+export function Cart({ waPhone, businessName, businessId }: { waPhone: string; businessName: string; businessId: string }) {
+  const { items, removeItem, getSubtotal, getTotal, getDeliveryFee, deliveryType, address, references, paymentMethod, clearCart } = useCartStore();
   const [isOrderTime, setIsOrderTime] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const subtotal = getSubtotal();
   const total = getTotal();
@@ -44,6 +46,37 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
     const intervalId = window.setInterval(updateSchedule, 60_000);
     return () => window.clearInterval(intervalId);
   }, []);
+
+  const handleOrder = async (e: React.MouseEvent) => {
+    if (!isOrderTime || items.length === 0) return;
+    
+    setIsSubmitting(true);
+    try {
+      const result = await createOrder({
+        businessId,
+        items,
+        total,
+        deliveryType,
+        address,
+        references,
+        paymentMethod
+      });
+
+      if (result.success) {
+        // Una vez guardado en la DB, abrimos WhatsApp
+        window.open(link, '_blank');
+        // Opcionalmente limpiamos el carrito
+        // clearCart();
+      } else {
+        alert('Hubo un error al procesar tu pedido. Por favor intenta de nuevo.');
+      }
+    } catch (error) {
+      console.error('Error handling order:', error);
+      alert('Error inesperado. Intenta de nuevo.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <aside className="surface-card space-y-3">
@@ -85,13 +118,13 @@ export function Cart({ waPhone, businessName }: { waPhone: string; businessName:
         <p className="mt-1 flex justify-between text-base font-bold text-slate-900 dark:text-slate-100"><span>Total:</span><span>${total}</span></p>
       </div>
 
-      <a
-        href={isOrderTime ? link : '#'}
-        aria-disabled={!isOrderTime}
-        className={`primary-btn w-full ${isOrderTime ? '' : 'pointer-events-none bg-slate-400 hover:bg-slate-400'}`}
+      <button
+        onClick={handleOrder}
+        disabled={!isOrderTime || isSubmitting || items.length === 0}
+        className={`primary-btn w-full ${isOrderTime && items.length > 0 ? '' : 'pointer-events-none bg-slate-400 hover:bg-slate-400'} ${isSubmitting ? 'animate-pulse opacity-70' : ''}`}
       >
-        Enviar por WhatsApp
-      </a>
+        {isSubmitting ? 'Procesando...' : 'Enviar por WhatsApp'}
+      </button>
       {!isOrderTime ? <p className="text-xs text-amber-600">Los pedidos solo están disponibles de 9:30 a 15:00 horas.</p> : null}
     </aside>
   );

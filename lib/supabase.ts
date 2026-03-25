@@ -1,17 +1,28 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-export function getSupabaseClient(): SupabaseClient | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Usamos variables de entorno con prefijo NEXT_PUBLIC para el cliente
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-  if (!url || !anonKey) return null;
-  return createClient(url, anonKey);
-}
+// Cliente Singleton para evitar múltiples instancias en el lado del cliente
+let supabaseInstance: SupabaseClient | null = null;
 
-export function requireSupabaseClient(): SupabaseClient {
-  const client = getSupabaseClient();
-  if (!client) {
-    throw new Error('Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY');
+export function getSupabaseClient(): SupabaseClient {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Faltan variables de entorno de Supabase: NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY');
   }
-  return client;
+
+  if (typeof window === 'undefined') {
+    // En el servidor, siempre creamos una nueva instancia o manejamos según sea necesario
+    return createClient(supabaseUrl, supabaseAnonKey);
+  }
+
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+  }
+
+  return supabaseInstance;
 }
+
+// Helper para obtener el cliente de forma rápida
+export const supabase = getSupabaseClient();
