@@ -53,18 +53,20 @@ export function Header({ title, subtitle, isOpen, eventHref }: HeaderProps) {
     <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 px-4 py-3 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-950/85">
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
-          {!logoError ? (
-            <img
-              src="/logotacosricos.png"
-              alt="Logo Tacos Ricos"
-              className="h-12 w-12 rounded-2xl border border-slate-200 object-cover shadow-sm dark:border-slate-700"
-              onError={() => setLogoError(true)}
-            />
-          ) : (
-            <div className="grid h-12 w-12 place-items-center rounded-2xl border border-slate-200 bg-amber-100 text-sm font-bold text-orange-700 dark:border-zinc-700 dark:bg-orange-500/15 dark:text-orange-200">
-              TR
-            </div>
-          )}
+          <Link href="/" className="transition-transform active:scale-95 hover:scale-105">
+            {!logoError ? (
+              <img
+                src="/logotacosricos.png"
+                alt="Logo Tacos Ricos"
+                className="h-12 w-12 rounded-2xl border border-slate-200 object-cover shadow-sm dark:border-slate-700"
+                onError={() => setLogoError(true)}
+              />
+            ) : (
+              <div className="grid h-12 w-12 place-items-center rounded-2xl border border-slate-200 bg-amber-100 text-sm font-bold text-orange-700 dark:border-zinc-700 dark:bg-orange-500/15 dark:text-orange-200">
+                TR
+              </div>
+            )}
+          </Link>
           <div className="min-w-0">
             <h1 className="truncate text-lg font-bold tracking-tight text-slate-900 sm:text-2xl dark:text-slate-100">{title}</h1>
             {subtitle ? <p className="truncate text-sm text-slate-500 dark:text-slate-400">{subtitle}</p> : null}
