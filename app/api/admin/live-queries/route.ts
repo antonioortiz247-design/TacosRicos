@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   const cookie = request.headers.get('cookie') ?? '';
   const hasAdminSession = cookie.includes('admin_session=1');

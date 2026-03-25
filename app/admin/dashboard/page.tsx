@@ -4,6 +4,8 @@ import { Header } from '@/components/Header';
 import { getOwnerDashboardMetrics } from '@/lib/admin-queries';
 import { RealtimeOrders } from '@/components/RealtimeOrders';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const businessId = 'demo';
   const metrics = await getOwnerDashboardMetrics(businessId);

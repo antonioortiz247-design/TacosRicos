@@ -8,6 +8,8 @@ import { Product } from '@/lib/types';
 import { getBusinessBySlug, getBusinessProducts } from '@/lib/admin-queries';
 import { notFound } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relleno', 'Campechanos', 'Chorizo Argentino', 'Chuleta'];
 
 // Reemplaza "archivo.ext" por el nombre real de archivo (ej: pechuga.jpg o productos/pechuga.jpg).
