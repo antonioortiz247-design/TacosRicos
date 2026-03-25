@@ -1,20 +1,18 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-// Usamos variables de entorno con prefijo NEXT_PUBLIC para el cliente
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-// Cliente Singleton para evitar múltiples instancias en el lado del cliente
+// Cliente Singleton para el lado del cliente
 let supabaseInstance: SupabaseClient | null = null;
 
 export function getSupabaseClient(): SupabaseClient | null {
   if (!supabaseUrl || !supabaseAnonKey) {
-    // En lugar de lanzar error, devolvemos null para no romper el build de Next.js
-    console.warn('Advertencia: Faltan variables de entorno de Supabase.');
     return null;
   }
 
   if (typeof window === 'undefined') {
+    // En el servidor, creamos uno nuevo por cada request o usamos cache si es necesario
     return createClient(supabaseUrl, supabaseAnonKey);
   }
 
@@ -25,5 +23,9 @@ export function getSupabaseClient(): SupabaseClient | null {
   return supabaseInstance;
 }
 
-// Helper para obtener el cliente de forma rápida (puede ser null)
-export const supabase = getSupabaseClient()!;
+// Exportamos un cliente base para compatibilidad, pero siempre es mejor usar getSupabaseClient()
+// Usamos un placeholder para evitar errores de construcción en Vercel si faltan las env vars
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder'
+);

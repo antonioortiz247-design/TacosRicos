@@ -37,17 +37,19 @@ export async function getOwnerDashboardMetrics(businessId: string) {
       orders: 0,
       avgTicket: 0,
       topProducts: 'Sin datos',
-      recentOrders: [] as Array<{ id: string; total: number; status: string }>
+      recentOrders: [] as Array<{ id: string; total: number; status: string }>,
+      products: [] as any[]
     };
   }
 
   const today = new Date().toISOString().slice(0, 10);
 
-  const [salesResult, ordersResult, topResult, recentResult] = await Promise.all([
+  const [salesResult, ordersResult, topResult, recentResult, productsResult] = await Promise.all([
     supabase.from('orders').select('total').eq('business_id', businessId).gte('created_at', `${today}T00:00:00`).lte('created_at', `${today}T23:59:59`),
     supabase.from('orders').select('id', { count: 'exact', head: true }).eq('business_id', businessId).gte('created_at', `${today}T00:00:00`).lte('created_at', `${today}T23:59:59`),
     supabase.from('order_items').select('product_name').limit(200),
-    supabase.from('orders').select('id,total,status,created_at').eq('business_id', businessId).order('created_at', { ascending: false }).limit(5)
+    supabase.from('orders').select('id,total,status,created_at').eq('business_id', businessId).order('created_at', { ascending: false }).limit(5),
+    supabase.from('products').select('*').eq('business_id', businessId).order('name')
   ]);
 
   const totalSales = (salesResult.data ?? []).reduce((sum, row) => sum + Number(row.total || 0), 0);
@@ -71,6 +73,6 @@ export async function getOwnerDashboardMetrics(businessId: string) {
     avgTicket,
     topProducts,
     recentOrders: recentResult.data ?? [],
-    products: (topResult.data ?? []).length > 0 ? (await supabase.from('products').select('*').eq('business_id', businessId).order('name')) .data ?? [] : []
+    products: productsResult.data ?? []
   };
 }

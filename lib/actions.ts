@@ -1,10 +1,13 @@
 'use server';
 
-import { supabase } from './supabase';
+import { getSupabaseClient } from './supabase';
 import { OrderSchema, OrderInput } from './validations';
 
 export async function createOrder(params: OrderInput) {
   try {
+    const supabase = getSupabaseClient();
+    if (!supabase) throw new Error('No se pudo conectar con la base de datos');
+
     // Validar datos en el servidor
     const validated = OrderSchema.parse(params);
 
@@ -45,6 +48,9 @@ export async function createOrder(params: OrderInput) {
 
 export async function updateProductPrice(productId: string, newPrice: number) {
   try {
+    const supabase = getSupabaseClient();
+    if (!supabase) throw new Error('No se pudo conectar con la base de datos');
+
     const { error } = await supabase
       .from('products')
       .update({ price: newPrice })

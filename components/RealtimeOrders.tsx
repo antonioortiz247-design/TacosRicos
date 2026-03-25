@@ -14,6 +14,11 @@ export function RealtimeOrders({ initialOrders, businessId }: { initialOrders: O
   const [orders, setOrders] = useState<Order[]>(initialOrders);
 
   useEffect(() => {
+    if (!supabase || !supabase.channel) {
+      console.warn('Supabase no está configurado para Realtime.');
+      return;
+    }
+
     const channel = supabase
       .channel('orders-realtime')
       .on(
