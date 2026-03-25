@@ -11,7 +11,7 @@ const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relle
 // Reemplaza "archivo.ext" por el nombre real de archivo (ej: pechuga.jpg o productos/pechuga.jpg).
 const PRODUCT_IMAGE_FILE_NAMES: Partial<Record<string, string>> = {
   Barriga: 'TacodeBarriga.jpg',
-  Suadero: 'TacodeSuadero.jpg',
+  Suadero: 'TacodeSuadero.png',
   Pechuga: 'TacodePechuga.jpg',
   Longaniza: 'TacodeLonganiza.jpg',
   'Chile Relleno': 'TacodeChile.jpg',
