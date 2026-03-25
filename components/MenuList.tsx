@@ -21,7 +21,7 @@ export function MenuList({ products }: { products: Product[] }) {
   const byCategory = Object.keys(sectionTitles).map((key) => ({
     key: key as Product['category'],
     label: sectionTitles[key as Product['category']],
-    items: products.filter((product) => product.active && product.category === key)
+    items: products.filter((product) => product.active && product.category === key && (product.stock === undefined || product.stock > 0))
   }));
 
   return (

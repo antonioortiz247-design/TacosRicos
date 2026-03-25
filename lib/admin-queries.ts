@@ -3,6 +3,30 @@ import { getSupabaseClient } from './supabase';
 export const SALES_QUERY_SQL = 'SELECT SUM(total) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
 export const ORDERS_QUERY_SQL = 'SELECT COUNT(*) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
 
+export async function getBusinessBySlug(slug: string) {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from('businesses')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+  
+  if (error) return null;
+  return data;
+}
+
+export async function getBusinessProducts(businessId: string) {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('business_id', businessId)
+    .eq('active', true);
+  
+  if (error) return [];
+  return data;
+}
+
 export async function getOwnerDashboardMetrics(businessId: string) {
   const supabase = getSupabaseClient();
   if (!supabase) {

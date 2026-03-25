@@ -5,6 +5,8 @@ import { Header } from '@/components/Header';
 import { MenuList } from '@/components/MenuList';
 import { PaymentSelector } from '@/components/PaymentSelector';
 import { Product } from '@/lib/types';
+import { getBusinessBySlug, getBusinessProducts } from '@/lib/admin-queries';
+import { notFound } from 'next/navigation';
 
 const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relleno', 'Campechanos', 'Chorizo Argentino', 'Chuleta'];
 
@@ -96,8 +98,21 @@ const fallbackProducts: Product[] = [
   }
 ];
 
-export default function BusinessMenuPage({ params }: { params: { negocio: string } }) {
-  const businessDisplayName = params.negocio.toLowerCase() === 'demo' ? 'Tacos Rico´s' : `Taquería ${params.negocio}`;
+export default async function BusinessMenuPage({ params }: { params: { negocio: string } }) {
+  // Intentar obtener el negocio real desde la base de datos
+  const business = await getBusinessBySlug(params.negocio);
+  
+  // Si no existe y no es demo, 404
+  if (!business && params.negocio.toLowerCase() !== 'demo') {
+    notFound();
+  }
+
+  // Si es demo o no hay productos en DB, usar fallback
+  const dbProducts = business ? await getBusinessProducts(business.id) : [];
+  const products = dbProducts.length > 0 ? (dbProducts as any as Product[]) : fallbackProducts;
+
+  const businessDisplayName = business ? business.name : (params.negocio.toLowerCase() === 'demo' ? 'Tacos Rico´s' : `Taquería ${params.negocio}`);
+  const businessId = business ? business.id : params.negocio;
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl pb-24">
@@ -109,13 +124,13 @@ export default function BusinessMenuPage({ params }: { params: { negocio: string
             <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Menú del día</h2>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Selecciona tus favoritos, personaliza y confirma tu pedido en WhatsApp.</p>
           </div>
-          <MenuList products={fallbackProducts} />
+          <MenuList products={products} />
         </div>
 
         <div className="space-y-4 md:sticky md:top-[92px] md:self-start">
           <DeliverySelector />
           <PaymentSelector />
-          <Cart waPhone="5215512345678" businessName={businessDisplayName} businessId={params.negocio} />
+          <Cart waPhone="5215512345678" businessName={businessDisplayName} businessId={businessId} />
         </div>
       </section>
 

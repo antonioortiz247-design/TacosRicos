@@ -15,6 +15,7 @@ export type Product = {
   imageUrl?: string;
   active: boolean;
   customizable?: boolean;
+  stock?: number;
 };
 
 export type TacoConfig = {

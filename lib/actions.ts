@@ -1,28 +1,23 @@
 'use server';
 
 import { supabase } from './supabase';
-import { CartItem, DeliveryType, PaymentMethod } from './types';
+import { OrderSchema, OrderInput } from './validations';
 
-export async function createOrder(params: {
-  businessId: string;
-  items: CartItem[];
-  total: number;
-  deliveryType: DeliveryType;
-  address?: string;
-  references?: string;
-  paymentMethod: PaymentMethod;
-}) {
+export async function createOrder(params: OrderInput) {
   try {
+    // Validar datos en el servidor
+    const validated = OrderSchema.parse(params);
+
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
-        business_id: params.businessId,
-        items: params.items,
-        total: params.total,
-        delivery_type: params.deliveryType,
-        address: params.address,
-        references: params.references,
-        payment_method: params.paymentMethod,
+        business_id: validated.businessId,
+        items: validated.items,
+        total: validated.total,
+        delivery_type: validated.deliveryType,
+        address: validated.address,
+        references: validated.references,
+        payment_method: validated.paymentMethod,
         payment_status: 'pending',
         status: 'pending',
       })
@@ -32,7 +27,7 @@ export async function createOrder(params: {
     if (orderError) throw orderError;
 
     // Insertar items individuales para reportes más detallados
-    const orderItems = params.items.map((item) => ({
+    const orderItems = validated.items.map((item) => ({
       order_id: order.id,
       product_name: item.productName,
       config: item.config,

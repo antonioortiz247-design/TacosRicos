@@ -1,6 +1,7 @@
 'use client';
 
 import { Product } from '@/lib/types';
+import Image from 'next/image';
 
 export function ProductCard({
   product,
@@ -13,16 +14,17 @@ export function ProductCard({
 }) {
   return (
     <article className="surface-card group overflow-hidden p-3 sm:p-4">
-      <div className="mb-3 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
+      <div className="relative mb-3 aspect-video overflow-hidden rounded-xl border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
         {product.imageUrl ? (
-          <img
+          <Image
             src={product.imageUrl}
             alt={product.name}
-            className="h-44 w-full object-cover transition duration-300 group-hover:scale-[1.02]"
-            loading="lazy"
+            fill
+            className="object-cover transition duration-300 group-hover:scale-[1.05]"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
-          <div className="grid h-44 place-items-center text-xs text-slate-500">Imagen del producto</div>
+          <div className="grid h-full place-items-center text-xs text-slate-500">Imagen del producto</div>
         )}
       </div>
       <div className="flex items-start justify-between gap-3">
