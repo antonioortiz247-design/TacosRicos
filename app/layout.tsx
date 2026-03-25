@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { FloatingCart } from '@/components/FloatingCart';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es" className="h-full">
       <body className={`${inter.className} h-full bg-zinc-50 text-zinc-900 antialiased`}>
         {children}
+        <FloatingCart />
       </body>
     </html>
   );
