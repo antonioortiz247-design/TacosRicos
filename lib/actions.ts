@@ -42,3 +42,18 @@ export async function createOrder(params: OrderInput) {
     return { success: false, error: 'No se pudo crear el pedido' };
   }
 }
+
+export async function updateProductPrice(productId: string, newPrice: number) {
+  try {
+    const { error } = await supabase
+      .from('products')
+      .update({ price: newPrice })
+      .eq('id', productId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating product price:', error);
+    return { success: false, error: 'No se pudo actualizar el precio' };
+  }
+}

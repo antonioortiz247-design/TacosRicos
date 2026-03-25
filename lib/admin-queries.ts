@@ -70,6 +70,7 @@ export async function getOwnerDashboardMetrics(businessId: string) {
     orders: ordersCount,
     avgTicket,
     topProducts,
-    recentOrders: recentResult.data ?? []
+    recentOrders: recentResult.data ?? [],
+    products: (topResult.data ?? []).length > 0 ? (await supabase.from('products').select('*').eq('business_id', businessId).order('name')) .data ?? [] : []
   };
 }

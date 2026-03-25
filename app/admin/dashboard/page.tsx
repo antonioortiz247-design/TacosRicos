@@ -3,6 +3,7 @@ import { AdminLiveQueriesPanel } from '@/components/AdminLiveQueriesPanel';
 import { Header } from '@/components/Header';
 import { getOwnerDashboardMetrics } from '@/lib/admin-queries';
 import { RealtimeOrders } from '@/components/RealtimeOrders';
+import { ProductPriceManager } from '@/components/ProductPriceManager';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,10 +16,15 @@ export default async function DashboardPage() {
     return (
       <main className="mx-auto min-h-screen max-w-6xl p-4">
         <Header title="Admin · Dashboard" subtitle="Ventas y rendimiento del día" />
-        <div className="mt-4 space-y-4">
-          <AdminPanel metrics={metrics} />
-          <AdminLiveQueriesPanel />
-          <RealtimeOrders initialOrders={metrics.recentOrders} businessId={businessId} />
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <div className="space-y-4">
+            <AdminPanel metrics={metrics} />
+            <AdminLiveQueriesPanel />
+            <RealtimeOrders initialOrders={metrics.recentOrders} businessId={businessId} />
+          </div>
+          <div className="space-y-4">
+            <ProductPriceManager products={metrics.products as any} />
+          </div>
         </div>
       </main>
     );
