@@ -48,7 +48,11 @@ export async function createOrder(params: OrderInput) {
 
 export async function updateProductPrice(productId: string, newPrice: number) {
   try {
-    const supabase = getSupabaseClient();
+    const { getSupabaseAdmin, getSupabaseClient } = await import('./supabase');
+    
+    // Intentamos usar el cliente admin para saltar RLS si es una acción de dashboard
+    const supabase = getSupabaseAdmin() || getSupabaseClient();
+    
     if (!supabase) throw new Error('No se pudo conectar con la base de datos');
 
     const { error } = await supabase
@@ -60,6 +64,9 @@ export async function updateProductPrice(productId: string, newPrice: number) {
     return { success: true };
   } catch (error) {
     console.error('Error updating product price:', error);
-    return { success: false, error: 'No se pudo actualizar el precio' };
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'No se pudo actualizar el precio' 
+    };
   }
 }

@@ -25,7 +25,7 @@ export function ProductPriceManager({ products: initialProducts }: { products: P
         setSuccessId(id);
         setTimeout(() => setSuccessId(null), 3000);
       } else {
-        alert('Error al actualizar el precio');
+        alert(`Error al actualizar el precio: ${result.error || 'Error desconocido'}`);
       }
     } catch (error) {
       console.error(error);
