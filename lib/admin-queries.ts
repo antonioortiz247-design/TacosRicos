@@ -134,6 +134,17 @@ export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
 
   if (productsResult.error) {
     console.error('Error al cargar productos:', productsResult.error);
+    if (productsResult.error.message?.includes('not find the table')) {
+      return {
+        sales: 0,
+        orders: 0,
+        avgTicket: 0,
+        topProducts: 'Base de datos no inicializada',
+        recentOrders: [],
+        products: [],
+        businessName: 'Error: Ejecuta el SQL en Supabase'
+      };
+    }
   }
 
   const totalSales = (salesResult.data ?? []).reduce((sum, row) => sum + Number(row.total || 0), 0);

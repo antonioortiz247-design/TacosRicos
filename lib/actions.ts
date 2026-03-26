@@ -104,7 +104,12 @@ export async function seedProducts(businessIdOrSlug: string) {
     const supabase = adminClient || publicClient;
     
     if (!supabase) throw new Error('No se pudo conectar con la base de datos (Supabase)');
-    if (!adminClient) throw new Error('Falta la variable SUPABASE_SERVICE_ROLE_KEY en el servidor. No se pueden realizar inserciones administrativas sin ella.');
+    if (!adminClient) throw new Error('Falta la variable SUPABASE_SERVICE_ROLE_KEY en el servidor.');
+
+    // Validar que el identificador no sea un token filtrado
+    if (businessIdOrSlug.startsWith('eyJ') || businessIdOrSlug.length > 50) {
+      throw new Error('El ID de negocio parece ser un token de seguridad (JWT) en lugar de un nombre o UUID. Por favor revisa la variable NEXT_PUBLIC_DEFAULT_BUSINESS_ID en Vercel.');
+    }
 
     let businessId = businessIdOrSlug;
     const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(businessIdOrSlug);
@@ -187,7 +192,12 @@ export async function seedProducts(businessIdOrSlug: string) {
     return { success: true };
   } catch (error: any) {
     console.error('Excepción en seedProducts:', error);
-    const errorMessage = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
+    let errorMessage = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
+    
+    if (errorMessage.includes('public.businesses') || errorMessage.includes('public.products')) {
+      errorMessage = 'Error: No se encontraron las tablas en Supabase. Asegúrate de copiar y ejecutar el contenido de "supabase/schema.sql" en el SQL Editor de tu proyecto Supabase.';
+    }
+    
     return { success: false, error: errorMessage };
   }
 }
@@ -227,7 +237,12 @@ export async function createProduct(product: Partial<Product>) {
     return { success: true, product: data };
   } catch (error: any) {
     console.error('Excepción en createProduct:', error);
-    const errorMessage = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
+    let errorMessage = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
+    
+    if (errorMessage.includes('public.products')) {
+      errorMessage = 'Error: La tabla de productos no existe. Ejecuta el SQL de "supabase/schema.sql" en Supabase.';
+    }
+    
     return { success: false, error: errorMessage };
   }
 }
