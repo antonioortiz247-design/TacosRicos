@@ -97,18 +97,27 @@ export async function updateProductPrice(productId: string, newPrice: number) {
 
 export async function seedProducts(businessIdOrSlug: string) {
   try {
+    console.log(`Iniciando seed para: ${businessIdOrSlug}`);
     const { getSupabaseAdmin, getSupabaseClient } = await import('./supabase');
-    const supabase = getSupabaseAdmin() || getSupabaseClient();
-    if (!supabase) throw new Error('No se pudo conectar con la base de datos');
+    const adminClient = getSupabaseAdmin();
+    const publicClient = getSupabaseClient();
+    const supabase = adminClient || publicClient;
+    
+    if (!supabase) throw new Error('No se pudo conectar con la base de datos (Supabase)');
+    if (!adminClient) console.warn('Usando cliente público (RLS podría bloquear la inserción)');
 
     let businessId = businessIdOrSlug;
     const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(businessIdOrSlug);
     
     if (!isUUID) {
-      const { data: biz } = await supabase.from('businesses').select('id').eq('slug', businessIdOrSlug).single();
+      console.log(`Identificador "${businessIdOrSlug}" no es UUID, buscando slug...`);
+      const { data: biz, error: bizError } = await supabase.from('businesses').select('id').eq('slug', businessIdOrSlug).single();
+      
       if (biz) {
         businessId = biz.id;
+        console.log(`Negocio encontrado por slug: ${businessId}`);
       } else {
+        console.log(`Slug no encontrado, intentando crear negocio: ${businessIdOrSlug}`);
         // Si no existe, lo creamos
         const { data: newBiz, error: createError } = await supabase
           .from('businesses')
@@ -116,8 +125,12 @@ export async function seedProducts(businessIdOrSlug: string) {
           .select()
           .single();
         
-        if (createError) throw createError;
+        if (createError) {
+          console.error('Error al crear negocio:', createError);
+          throw createError;
+        }
         businessId = newBiz.id;
+        console.log(`Nuevo negocio creado: ${businessId}`);
       }
     }
 
@@ -150,21 +163,32 @@ export async function seedProducts(businessIdOrSlug: string) {
       }
     ];
 
+    console.log(`Insertando ${productsToSeed.length} productos para el negocio ${businessId}`);
     const { error } = await supabase.from('products').insert(productsToSeed);
-    if (error) throw error;
+    
+    if (error) {
+      console.error('Error de Supabase al insertar productos:', error);
+      throw error;
+    }
 
+    console.log('Seed completado con éxito');
     return { success: true };
   } catch (error) {
-    console.error('Error seeding products:', error);
+    console.error('Excepción en seedProducts:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
   }
 }
 
 export async function createProduct(product: Partial<Product>) {
   try {
+    console.log('Creando nuevo producto:', product.name);
     const { getSupabaseAdmin, getSupabaseClient } = await import('./supabase');
-    const supabase = getSupabaseAdmin() || getSupabaseClient();
-    if (!supabase) throw new Error('No se pudo conectar con la base de datos');
+    const adminClient = getSupabaseAdmin();
+    const publicClient = getSupabaseClient();
+    const supabase = adminClient || publicClient;
+    
+    if (!supabase) throw new Error('No se pudo conectar con la base de datos (Supabase)');
+    if (!adminClient) console.warn('Usando cliente público (RLS podría bloquear la inserción)');
 
     const { data, error } = await supabase
       .from('products')
@@ -181,10 +205,15 @@ export async function createProduct(product: Partial<Product>) {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error de Supabase al crear producto:', error);
+      throw error;
+    }
+    
+    console.log('Producto creado con éxito:', data.id);
     return { success: true, product: data };
   } catch (error) {
-    console.error('Error creating product:', error);
+    console.error('Excepción en createProduct:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
   }
 }
