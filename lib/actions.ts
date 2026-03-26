@@ -2,6 +2,7 @@
 
 import { getSupabaseClient } from './supabase';
 import { OrderSchema, OrderInput } from './validations';
+import { Product } from './types';
 
 export async function createOrder(params: OrderInput) {
   try {
