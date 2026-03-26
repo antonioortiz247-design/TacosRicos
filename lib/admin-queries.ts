@@ -85,7 +85,7 @@ export async function getOwnerDashboardMetrics(businessId: string) {
   const [salesResult, ordersResult, topResult, recentResult, productsResult] = await Promise.all([
     supabase.from('orders').select('total').eq('business_id', businessId).gte('created_at', `${today}T00:00:00`).lte('created_at', `${today}T23:59:59`),
     supabase.from('orders').select('id', { count: 'exact', head: true }).eq('business_id', businessId).gte('created_at', `${today}T00:00:00`).lte('created_at', `${today}T23:59:59`),
-    supabase.from('order_items').select('product_name').limit(200),
+    supabase.from('order_items').select('product_name, orders!inner(business_id)').eq('orders.business_id', businessId).limit(200),
     supabase.from('orders').select('id,total,status,created_at').eq('business_id', businessId).order('created_at', { ascending: false }).limit(5),
     supabase.from('products').select('*').eq('business_id', businessId).order('name')
   ]);

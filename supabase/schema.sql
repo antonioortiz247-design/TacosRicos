@@ -13,6 +13,9 @@ create table if not exists products (
   price numeric(10,2) not null,
   image_url text,
   active boolean default true,
+  customizable boolean default true,
+  stock integer,
+  description text,
   created_at timestamptz default now()
 );
 

@@ -93,3 +93,26 @@ export async function updateProductPrice(productId: string, newPrice: number) {
     };
   }
 }
+
+export async function updateOrderStatus(orderId: string, status: string) {
+  try {
+    const { getSupabaseAdmin, getSupabaseClient } = await import('./supabase');
+    const supabase = getSupabaseAdmin() || getSupabaseClient();
+    
+    if (!supabase) throw new Error('No se pudo conectar con la base de datos');
+
+    const { error } = await supabase
+      .from('orders')
+      .update({ status })
+      .eq('id', orderId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'No se pudo actualizar el estado' 
+    };
+  }
+}
