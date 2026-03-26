@@ -125,6 +125,16 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
             <p className="text-sm text-zinc-500 mt-1">Actualiza los precios de tu menú en tiempo real</p>
           </div>
           <div className="flex items-center gap-2">
+            {products.length === 0 && (
+              <button 
+                onClick={handleSeed}
+                disabled={isSeeding}
+                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 disabled:opacity-50"
+              >
+                {isSeeding ? <Loader2 className="animate-spin" size={16} /> : <PlusCircle size={16} />}
+                Importar Menú Base
+              </button>
+            )}
             <button 
               onClick={() => setIsAdding(!isAdding)}
               className="inline-flex items-center gap-2 rounded-xl bg-warm-600 px-4 py-2 text-xs font-bold text-white hover:bg-warm-700"
