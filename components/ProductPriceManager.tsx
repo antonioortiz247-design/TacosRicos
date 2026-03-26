@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { updateProductPrice, seedProducts } from '@/lib/actions';
+import { updateProductPrice, seedProducts, createProduct } from '@/lib/actions';
 import { Product, ProductCategory } from '@/lib/types';
-import { Save, Loader2, DollarSign, CheckCircle2, Search, Filter, Tag, PlusCircle } from 'lucide-react';
+import { Save, Loader2, DollarSign, CheckCircle2, Search, Filter, Tag, PlusCircle, X } from 'lucide-react';
 
 export function ProductPriceManager({ products: initialProducts, businessId }: { products: Product[], businessId?: string }) {
   const [products, setProducts] = useState(initialProducts);
@@ -12,6 +12,38 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
   const [searchTerm, setSearchBar] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [isSeeding, setIsSeeding] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  
+  // New product form state
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    price: 0,
+    category: 'tacos' as ProductCategory,
+    description: ''
+  });
+
+  const handleAddProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!businessId) return;
+    setIsAdding(true);
+    try {
+      const result = await createProduct({
+        ...newProduct,
+        businessId
+      });
+      if (result.success) {
+        setProducts(prev => [...prev, result.product as any]);
+        setIsAdding(false);
+        setNewProduct({ name: '', price: 0, category: 'tacos', description: '' });
+      } else {
+        alert('Error: ' + result.error);
+      }
+    } catch (error) {
+      alert('Error de conexión');
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
   const handleSeed = async () => {
     if (!businessId) return;
@@ -93,12 +125,60 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
             <p className="text-sm text-zinc-500 mt-1">Actualiza los precios de tu menú en tiempo real</p>
           </div>
           <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setIsAdding(!isAdding)}
+              className="inline-flex items-center gap-2 rounded-xl bg-warm-600 px-4 py-2 text-xs font-bold text-white hover:bg-warm-700"
+            >
+              {isAdding ? <X size={16} /> : <PlusCircle size={16} />}
+              {isAdding ? 'Cerrar' : 'Añadir Producto'}
+            </button>
             <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
               {products.length} productos
             </span>
           </div>
         </div>
         
+        {isAdding && (
+          <form onSubmit={handleAddProduct} className="mb-6 rounded-xl border border-warm-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-800">
+            <h3 className="mb-3 text-sm font-bold text-zinc-800 dark:text-zinc-200">Nuevo Producto</h3>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <input 
+                required
+                placeholder="Nombre del producto"
+                value={newProduct.name}
+                onChange={e => setNewProduct(prev => ({ ...prev, name: e.target.value }))}
+                className="rounded-lg border border-warm-100 bg-warm-50/30 px-3 py-2 text-sm focus:border-warm-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
+              />
+              <input 
+                required
+                type="number"
+                placeholder="Precio"
+                value={newProduct.price || ''}
+                onChange={e => setNewProduct(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
+                className="rounded-lg border border-warm-100 bg-warm-50/30 px-3 py-2 text-sm focus:border-warm-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
+              />
+              <select
+                value={newProduct.category}
+                onChange={e => setNewProduct(prev => ({ ...prev, category: e.target.value as ProductCategory }))}
+                className="rounded-lg border border-warm-100 bg-warm-50/30 px-3 py-2 text-sm focus:border-warm-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
+              >
+                <option value="tacos">Tacos</option>
+                <option value="especialidades">Especialidades</option>
+                <option value="viernes">Viernes</option>
+                <option value="miercoles">Miércoles</option>
+                <option value="jueves">Jueves</option>
+              </select>
+              <button 
+                type="submit"
+                disabled={isAdding && !newProduct.name}
+                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-50"
+              >
+                Guardar Nuevo Producto
+              </button>
+            </div>
+          </form>
+        )}
+
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />

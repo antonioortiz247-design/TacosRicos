@@ -105,8 +105,19 @@ export async function seedProducts(businessIdOrSlug: string) {
     
     if (!isUUID) {
       const { data: biz } = await supabase.from('businesses').select('id').eq('slug', businessIdOrSlug).single();
-      if (biz) businessId = biz.id;
-      else throw new Error('Negocio no encontrado');
+      if (biz) {
+        businessId = biz.id;
+      } else {
+        // Si no existe, lo creamos
+        const { data: newBiz, error: createError } = await supabase
+          .from('businesses')
+          .insert({ name: businessIdOrSlug, slug: businessIdOrSlug })
+          .select()
+          .single();
+        
+        if (createError) throw createError;
+        businessId = newBiz.id;
+      }
     }
 
     // Fallback products from menu page
@@ -144,6 +155,35 @@ export async function seedProducts(businessIdOrSlug: string) {
     return { success: true };
   } catch (error) {
     console.error('Error seeding products:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
+  }
+}
+
+export async function createProduct(product: Partial<Product>) {
+  try {
+    const { getSupabaseAdmin, getSupabaseClient } = await import('./supabase');
+    const supabase = getSupabaseAdmin() || getSupabaseClient();
+    if (!supabase) throw new Error('No se pudo conectar con la base de datos');
+
+    const { data, error } = await supabase
+      .from('products')
+      .insert({
+        business_id: product.businessId,
+        category: product.category,
+        name: product.name,
+        price: product.price,
+        active: true,
+        customizable: product.customizable ?? true,
+        description: product.description,
+        image_url: product.imageUrl
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, product: data };
+  } catch (error) {
+    console.error('Error creating product:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
   }
 }
