@@ -5,27 +5,39 @@ export const ORDERS_QUERY_SQL = 'SELECT COUNT(*) FROM orders WHERE DATE(created_
 
 export async function getBusinessBySlug(slug: string) {
   const supabase = getSupabaseClient();
-  if (!supabase) return null;
+  if (!supabase) {
+    console.error('Supabase client not available in getBusinessBySlug');
+    return null;
+  }
   const { data, error } = await supabase
     .from('businesses')
     .select('*')
     .eq('slug', slug)
     .single();
   
-  if (error) return null;
+  if (error) {
+    console.error('Error fetching business by slug:', error);
+    return null;
+  }
   return data;
 }
 
 export async function getBusinessProducts(businessId: string) {
   const supabase = getSupabaseClient();
-  if (!supabase) return [];
+  if (!supabase) {
+    console.error('Supabase client not available in getBusinessProducts');
+    return [];
+  }
   const { data, error } = await supabase
     .from('products')
     .select('*')
     .eq('business_id', businessId)
     .eq('active', true);
   
-  if (error) return [];
+  if (error) {
+    console.error('Error fetching products:', error);
+    return [];
+  }
   return data;
 }
 

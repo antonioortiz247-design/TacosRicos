@@ -51,6 +51,8 @@ export default async function BusinessMenuPage({ params }: { params: { negocio: 
   // Obtener productos desde la DB
   const products = await getBusinessProducts(business.id) as any as Product[];
 
+  console.log(`Menu Page: Found business ${business.name} (${business.id}) with ${products.length} products`);
+
   // Obtener configuración del negocio (teléfono de WhatsApp)
   const settings = await getBusinessSettings(business.id);
   const waPhone = settings?.whatsapp_number || process.env.NEXT_PUBLIC_WA_PHONE || "5586495622";
