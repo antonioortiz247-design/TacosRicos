@@ -94,6 +94,60 @@ export async function updateProductPrice(productId: string, newPrice: number) {
   }
 }
 
+export async function seedProducts(businessIdOrSlug: string) {
+  try {
+    const { getSupabaseAdmin, getSupabaseClient } = await import('./supabase');
+    const supabase = getSupabaseAdmin() || getSupabaseClient();
+    if (!supabase) throw new Error('No se pudo conectar con la base de datos');
+
+    let businessId = businessIdOrSlug;
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(businessIdOrSlug);
+    
+    if (!isUUID) {
+      const { data: biz } = await supabase.from('businesses').select('id').eq('slug', businessIdOrSlug).single();
+      if (biz) businessId = biz.id;
+      else throw new Error('Negocio no encontrado');
+    }
+
+    // Fallback products from menu page
+    const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relleno', 'Campechanos', 'Chorizo Argentino', 'Chuleta'];
+    const productsToSeed = [
+      ...baseProducts.map((name) => ({
+        business_id: businessId,
+        category: 'tacos',
+        name,
+        price: 32,
+        active: true,
+        customizable: true
+      })),
+      {
+        business_id: businessId,
+        category: 'especialidades',
+        name: 'Burrito',
+        price: 100,
+        active: true,
+        customizable: true
+      },
+      {
+        business_id: businessId,
+        category: 'especialidades',
+        name: 'Gringas',
+        price: 70,
+        active: true,
+        customizable: true
+      }
+    ];
+
+    const { error } = await supabase.from('products').insert(productsToSeed);
+    if (error) throw error;
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error seeding products:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
+  }
+}
+
 export async function updateOrderStatus(orderId: string, status: string) {
   try {
     const { getSupabaseAdmin, getSupabaseClient } = await import('./supabase');

@@ -1,16 +1,34 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { updateProductPrice } from '@/lib/actions';
+import { updateProductPrice, seedProducts } from '@/lib/actions';
 import { Product, ProductCategory } from '@/lib/types';
-import { Save, Loader2, DollarSign, CheckCircle2, Search, Filter, Tag } from 'lucide-react';
+import { Save, Loader2, DollarSign, CheckCircle2, Search, Filter, Tag, PlusCircle } from 'lucide-react';
 
-export function ProductPriceManager({ products: initialProducts }: { products: Product[] }) {
+export function ProductPriceManager({ products: initialProducts, businessId }: { products: Product[], businessId?: string }) {
   const [products, setProducts] = useState(initialProducts);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
   const [searchTerm, setSearchBar] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [isSeeding, setIsSeeding] = useState(false);
+
+  const handleSeed = async () => {
+    if (!businessId) return;
+    setIsSeeding(true);
+    try {
+      const result = await seedProducts(businessId);
+      if (result.success) {
+        window.location.reload(); // Recargar para ver los nuevos productos
+      } else {
+        alert('Error al importar el menú: ' + result.error);
+      }
+    } catch (error) {
+      alert('Error de conexión');
+    } finally {
+      setIsSeeding(false);
+    }
+  };
 
   // Obtener categorías únicas
   const categories = useMemo(() => {
@@ -177,13 +195,29 @@ export function ProductPriceManager({ products: initialProducts }: { products: P
               <Search size={32} className="text-zinc-300" />
             </div>
             <p className="text-sm font-medium">No se encontraron productos</p>
-            <p className="text-xs mt-1">Prueba con otros filtros o términos de búsqueda</p>
-            <button 
-              onClick={() => { setSearchBar(''); setCategoryFilter('all'); }}
-              className="mt-4 text-xs font-bold text-warm-600 hover:underline"
-            >
-              Limpiar filtros
-            </button>
+            {products.length === 0 ? (
+              <div className="mt-4 max-w-xs mx-auto">
+                <p className="text-xs mb-4">Parece que tu menú aún no está en la base de datos. ¿Quieres importar el menú predeterminado?</p>
+                <button 
+                  onClick={handleSeed}
+                  disabled={isSeeding}
+                  className="flex items-center justify-center gap-2 w-full rounded-xl bg-warm-600 px-4 py-3 text-sm font-bold text-white hover:bg-warm-700 disabled:opacity-50"
+                >
+                  {isSeeding ? <Loader2 className="animate-spin" size={18} /> : <PlusCircle size={18} />}
+                  Importar Menú Base
+                </button>
+              </div>
+            ) : (
+              <>
+                <p className="text-xs mt-1">Prueba con otros filtros o términos de búsqueda</p>
+                <button 
+                  onClick={() => { setSearchBar(''); setCategoryFilter('all'); }}
+                  className="mt-4 text-xs font-bold text-warm-600 hover:underline"
+                >
+                  Limpiar filtros
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>

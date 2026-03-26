@@ -67,7 +67,7 @@ export async function getBusinessOrders(businessId: string) {
   return data;
 }
 
-export async function getOwnerDashboardMetrics(businessId: string) {
+export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
   const supabase = getSupabaseClient();
   if (!supabase) {
     return {
@@ -75,9 +75,51 @@ export async function getOwnerDashboardMetrics(businessId: string) {
       orders: 0,
       avgTicket: 0,
       topProducts: 'Sin datos',
-      recentOrders: [] as Array<{ id: string; total: number; status: string }>,
-      products: [] as any[]
+      recentOrders: [] as Array<{ id: string; total: number; status: string; created_at: string }>,
+      products: [] as any[],
+      businessName: 'No conectado'
     };
+  }
+
+  let businessId = businessIdOrSlug;
+
+  // Si no es un UUID válido, intentamos buscarlo como slug
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(businessIdOrSlug);
+  
+  if (!isUUID && businessIdOrSlug) {
+    console.log(`Buscando negocio por slug: ${businessIdOrSlug}`);
+    const { data: biz, error: bizError } = await supabase
+      .from('businesses')
+      .select('id, name')
+      .eq('slug', businessIdOrSlug)
+      .single();
+    
+    if (bizError) {
+      console.error('Error al buscar negocio por slug:', bizError);
+    }
+
+    if (biz) {
+      businessId = biz.id;
+      console.log(`Negocio encontrado: ${biz.name} (${biz.id})`);
+    } else {
+      // Si no se encuentra por slug, intentamos buscar el primer negocio disponible como fallback
+      console.warn(`No se encontró negocio para el slug: ${businessIdOrSlug}. Intentando obtener el primer negocio...`);
+      const { data: allBiz } = await supabase.from('businesses').select('id, name').limit(1);
+      if (allBiz && allBiz.length > 0) {
+        businessId = allBiz[0].id;
+        console.log(`Usando negocio fallback: ${allBiz[0].name} (${allBiz[0].id})`);
+      } else {
+        return {
+          sales: 0,
+          orders: 0,
+          avgTicket: 0,
+          topProducts: 'Negocio no encontrado',
+          recentOrders: [],
+          products: [],
+          businessName: 'No configurado'
+        };
+      }
+    }
   }
 
   const today = new Date().toISOString().slice(0, 10);
@@ -89,6 +131,10 @@ export async function getOwnerDashboardMetrics(businessId: string) {
     supabase.from('orders').select('id,total,status,created_at').eq('business_id', businessId).order('created_at', { ascending: false }).limit(5),
     supabase.from('products').select('*').eq('business_id', businessId).order('name')
   ]);
+
+  if (productsResult.error) {
+    console.error('Error al cargar productos:', productsResult.error);
+  }
 
   const totalSales = (salesResult.data ?? []).reduce((sum, row) => sum + Number(row.total || 0), 0);
   const ordersCount = ordersResult.count ?? 0;
@@ -105,12 +151,15 @@ export async function getOwnerDashboardMetrics(businessId: string) {
     .map(([name]) => name)
     .join(', ') || 'Sin datos';
 
+  const { data: currentBiz } = await supabase.from('businesses').select('name').eq('id', businessId).single();
+
   return {
     sales: totalSales,
     orders: ordersCount,
     avgTicket,
     topProducts,
-    recentOrders: recentResult.data ?? [],
-    products: productsResult.data ?? []
+    recentOrders: (recentResult.data ?? []) as any[],
+    products: productsResult.data ?? [],
+    businessName: currentBiz?.name || 'Negocio'
   };
 }
