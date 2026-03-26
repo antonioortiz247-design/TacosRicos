@@ -8,7 +8,7 @@ export function buildWhatsAppOrderMessage(params: {
   total: number;
   deliveryType: 'pickup' | 'delivery';
   address?: string;
-  references?: string;
+  address_references?: string;
   paymentMethod: string;
   paymentStatus?: 'pending' | 'paid' | 'failed';
 }): string {
@@ -24,7 +24,7 @@ export function buildWhatsAppOrderMessage(params: {
     '',
     `Entrega: ${params.deliveryType === 'pickup' ? 'Recoger en local' : 'Envío a domicilio'}`,
     params.address ? `Dirección: ${params.address}` : '',
-    params.references ? `Referencias: ${params.references}` : '',
+    params.address_references ? `Referencias: ${params.address_references}` : '',
     `Pago: ${params.paymentMethod}`,
     params.paymentStatus ? `Estado de pago: ${params.paymentStatus}` : '',
     `Subtotal: $${params.subtotal}`,

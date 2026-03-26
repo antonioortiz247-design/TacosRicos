@@ -42,7 +42,7 @@ export async function createOrder(params: OrderInput) {
         total: validated.total,
         delivery_type: validated.deliveryType,
         address: validated.address,
-        references: validated.references,
+        address_references: validated.address_references,
         payment_method: validated.paymentMethod,
         payment_status: 'pending',
         status: 'pending',

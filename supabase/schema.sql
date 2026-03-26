@@ -24,7 +24,7 @@ create table if not exists orders (
   total numeric(10,2) not null,
   delivery_type text not null,
   address text,
-  references text,
+  address_references text,
   payment_method text not null,
   payment_status text not null default 'pending',
   status text not null default 'pending',

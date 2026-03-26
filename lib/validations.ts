@@ -23,7 +23,7 @@ export const OrderSchema = z.object({
   total: z.number(),
   deliveryType: z.enum(['pickup', 'delivery']),
   address: z.string().optional(),
-  references: z.string().optional(),
+  address_references: z.string().optional(),
   paymentMethod: z.enum(['cash', 'transfer']),
 });
 

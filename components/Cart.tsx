@@ -14,7 +14,7 @@ function isWithinOrderSchedule(date: Date): boolean {
 }
 
 export function Cart({ waPhone, businessName, businessId }: { waPhone: string; businessName: string; businessId: string }) {
-  const { items, removeItem, getSubtotal, getTotal, getDeliveryFee, deliveryType, address, references, paymentMethod, clearCart } = useCartStore();
+  const { items, removeItem, getSubtotal, getTotal, getDeliveryFee, deliveryType, address, address_references, paymentMethod, clearCart } = useCartStore();
   const [isOrderTime, setIsOrderTime] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -32,10 +32,10 @@ export function Cart({ waPhone, businessName, businessId }: { waPhone: string; b
         deliveryFee,
         deliveryType,
         address,
-        references,
+        address_references,
         paymentMethod
       }),
-    [address, businessName, deliveryFee, deliveryType, items, paymentMethod, references, subtotal, total]
+    [address, businessName, deliveryFee, deliveryType, items, paymentMethod, address_references, subtotal, total]
   );
 
   const link = getWhatsAppLink(waPhone, message);
@@ -59,7 +59,7 @@ export function Cart({ waPhone, businessName, businessId }: { waPhone: string; b
         total,
         deliveryType,
         address,
-        references,
+        address_references,
         paymentMethod
       });
 
