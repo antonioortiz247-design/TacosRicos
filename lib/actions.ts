@@ -104,14 +104,14 @@ export async function seedProducts(businessIdOrSlug: string) {
     const supabase = adminClient || publicClient;
     
     if (!supabase) throw new Error('No se pudo conectar con la base de datos (Supabase)');
-    if (!adminClient) console.warn('Usando cliente público (RLS podría bloquear la inserción)');
+    if (!adminClient) throw new Error('Falta la variable SUPABASE_SERVICE_ROLE_KEY en el servidor. No se pueden realizar inserciones administrativas sin ella.');
 
     let businessId = businessIdOrSlug;
     const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(businessIdOrSlug);
     
-    if (!isUUID) {
+    if (!isUUID && businessIdOrSlug) {
       console.log(`Identificador "${businessIdOrSlug}" no es UUID, buscando slug...`);
-      const { data: biz, error: bizError } = await supabase.from('businesses').select('id').eq('slug', businessIdOrSlug).single();
+      const { data: biz, error: bizError } = await supabase.from('businesses').select('id').eq('slug', businessIdOrSlug).maybeSingle();
       
       if (biz) {
         businessId = biz.id;
@@ -127,10 +127,22 @@ export async function seedProducts(businessIdOrSlug: string) {
         
         if (createError) {
           console.error('Error al crear negocio:', createError);
-          throw createError;
+          throw new Error(`Error al crear el negocio "${businessIdOrSlug}": ${createError.message}`);
         }
         businessId = newBiz.id;
         console.log(`Nuevo negocio creado: ${businessId}`);
+      }
+    } else if (isUUID) {
+      // Verificar que el UUID existe
+      const { data: bizExists } = await supabase.from('businesses').select('id').eq('id', businessId).maybeSingle();
+      if (!bizExists) {
+        console.log(`UUID ${businessId} no existe, creando negocio con nombre genérico...`);
+        const { data: newBiz, error: createError } = await supabase
+          .from('businesses')
+          .insert({ id: businessId, name: 'Mi Negocio', slug: `negocio-${businessId.slice(0, 8)}` })
+          .select()
+          .single();
+        if (createError) throw new Error(`No se pudo crear el negocio con ID ${businessId}: ${createError.message}`);
       }
     }
 
@@ -173,9 +185,10 @@ export async function seedProducts(businessIdOrSlug: string) {
 
     console.log('Seed completado con éxito');
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Excepción en seedProducts:', error);
-    return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
+    const errorMessage = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
+    return { success: false, error: errorMessage };
   }
 }
 
@@ -188,7 +201,7 @@ export async function createProduct(product: Partial<Product>) {
     const supabase = adminClient || publicClient;
     
     if (!supabase) throw new Error('No se pudo conectar con la base de datos (Supabase)');
-    if (!adminClient) console.warn('Usando cliente público (RLS podría bloquear la inserción)');
+    if (!adminClient) throw new Error('Falta la variable SUPABASE_SERVICE_ROLE_KEY en el servidor.');
 
     const { data, error } = await supabase
       .from('products')
@@ -212,9 +225,10 @@ export async function createProduct(product: Partial<Product>) {
     
     console.log('Producto creado con éxito:', data.id);
     return { success: true, product: data };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Excepción en createProduct:', error);
-    return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
+    const errorMessage = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
+    return { success: false, error: errorMessage };
   }
 }
 

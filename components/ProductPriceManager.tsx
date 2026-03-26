@@ -46,17 +46,24 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
   };
 
   const handleSeed = async () => {
-    if (!businessId) return;
+    console.log('Iniciando importación para businessId:', businessId);
+    if (!businessId) {
+      alert('Error: ID de negocio no encontrado. Revisa tus variables de entorno.');
+      return;
+    }
     setIsSeeding(true);
     try {
       const result = await seedProducts(businessId);
+      console.log('Resultado de seed:', result);
       if (result.success) {
-        window.location.reload(); // Recargar para ver los nuevos productos
+        alert('¡Menú importado con éxito! La página se recargará.');
+        window.location.reload();
       } else {
         alert('Error al importar el menú: ' + result.error);
       }
     } catch (error) {
-      alert('Error de conexión');
+      console.error('Error en handleSeed:', error);
+      alert('Error de conexión al intentar importar');
     } finally {
       setIsSeeding(false);
     }
