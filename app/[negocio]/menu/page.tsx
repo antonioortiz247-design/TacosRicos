@@ -109,7 +109,7 @@ export default async function BusinessMenuPage({ params }: { params: { negocio: 
         </div>
       </section>
 
-      <FooterActions dashboardHref="/admin/login" />
+      <FooterActions dashboardHref={`/admin/login?negocio=${encodeURIComponent(params.negocio)}`} />
     </main>
   );
 }

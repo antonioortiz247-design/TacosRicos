@@ -16,7 +16,7 @@ export default function EventosPage({ params }: { params: { negocio: string } })
         <EventForm waPhone="5215512345678" />
       </section>
 
-      <FooterActions dashboardHref="/admin/login" />
+      <FooterActions dashboardHref={`/admin/login?negocio=${encodeURIComponent(params.negocio)}`} />
     </main>
   );
 }
