@@ -13,6 +13,11 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [isSeeding, setIsSeeding] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const businessIdentifierKind = useMemo<'uuid' | 'slug' | 'missing'>(() => {
+    if (!businessId) return 'missing';
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(businessId);
+    return isUUID ? 'uuid' : 'slug';
+  }, [businessId]);
   
   // New product form state
   const [newProduct, setNewProduct] = useState({
@@ -130,6 +135,13 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
               Editor de Precios
             </h2>
             <p className="text-sm text-zinc-500 mt-1">Actualiza los precios de tu menú en tiempo real</p>
+            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+              Identificador actual:{' '}
+              <span className="font-mono">{businessId || 'no configurado'}</span>{' '}
+              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                {businessIdentifierKind}
+              </span>
+            </p>
           </div>
           <div className="flex items-center gap-2">
             {products.length === 0 && (
