@@ -3,6 +3,39 @@ import { getSupabaseClient } from './supabase';
 export const SALES_QUERY_SQL = 'SELECT SUM(total) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
 export const ORDERS_QUERY_SQL = 'SELECT COUNT(*) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
 
+export async function resolveBusinessId(input: string) {
+  const supabase = getSupabaseClient();
+  if (!supabase) return null;
+
+  const normalized = input.trim();
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(normalized);
+
+  if (normalized && isUUID) {
+    return normalized;
+  }
+
+  if (normalized) {
+    const { data: bizBySlug } = await supabase
+      .from('businesses')
+      .select('id')
+      .eq('slug', normalized)
+      .maybeSingle();
+
+    if (bizBySlug?.id) {
+      return bizBySlug.id as string;
+    }
+  }
+
+  const { data: firstBusiness } = await supabase
+    .from('businesses')
+    .select('id')
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  return firstBusiness?.id ?? null;
+}
+
 export async function getBusinessBySlug(slug: string) {
   const supabase = getSupabaseClient();
   if (!supabase) {
@@ -57,10 +90,13 @@ export async function getBusinessSettings(businessId: string) {
 export async function getBusinessOrders(businessId: string) {
   const supabase = getSupabaseClient();
   if (!supabase) return [];
+  const resolvedBusinessId = await resolveBusinessId(businessId);
+  if (!resolvedBusinessId) return [];
+
   const { data, error } = await supabase
     .from('orders')
     .select('*')
-    .eq('business_id', businessId)
+    .eq('business_id', resolvedBusinessId)
     .order('created_at', { ascending: false });
   
   if (error) return [];
@@ -77,49 +113,23 @@ export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
       topProducts: 'Sin datos',
       recentOrders: [] as Array<{ id: string; total: number; status: string; created_at: string }>,
       products: [] as any[],
-      businessName: 'No conectado'
+      businessName: 'No conectado',
+      businessId: ''
     };
   }
 
-  let businessId = businessIdOrSlug;
-
-  // Si no es un UUID válido, intentamos buscarlo como slug
-  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(businessIdOrSlug);
-  
-  if (!isUUID && businessIdOrSlug) {
-    console.log(`Buscando negocio por slug: ${businessIdOrSlug}`);
-    const { data: biz, error: bizError } = await supabase
-      .from('businesses')
-      .select('id, name')
-      .eq('slug', businessIdOrSlug)
-      .single();
-    
-    if (bizError) {
-      console.error('Error al buscar negocio por slug:', bizError);
-    }
-
-    if (biz) {
-      businessId = biz.id;
-      console.log(`Negocio encontrado: ${biz.name} (${biz.id})`);
-    } else {
-      // Si no se encuentra por slug, intentamos buscar el primer negocio disponible como fallback
-      console.warn(`No se encontró negocio para el slug: ${businessIdOrSlug}. Intentando obtener el primer negocio...`);
-      const { data: allBiz } = await supabase.from('businesses').select('id, name').limit(1);
-      if (allBiz && allBiz.length > 0) {
-        businessId = allBiz[0].id;
-        console.log(`Usando negocio fallback: ${allBiz[0].name} (${allBiz[0].id})`);
-      } else {
-        return {
-          sales: 0,
-          orders: 0,
-          avgTicket: 0,
-          topProducts: 'Negocio no encontrado',
-          recentOrders: [],
-          products: [],
-          businessName: 'No configurado'
-        };
-      }
-    }
+  const businessId = await resolveBusinessId(businessIdOrSlug);
+  if (!businessId) {
+    return {
+      sales: 0,
+      orders: 0,
+      avgTicket: 0,
+      topProducts: 'Negocio no encontrado',
+      recentOrders: [],
+      products: [],
+      businessName: 'No configurado',
+      businessId: ''
+    };
   }
 
   const today = new Date().toISOString().slice(0, 10);
@@ -142,7 +152,8 @@ export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
         topProducts: 'Base de datos no inicializada',
         recentOrders: [],
         products: [],
-        businessName: 'Error: Ejecuta el SQL en Supabase'
+        businessName: 'Error: Ejecuta el SQL en Supabase',
+        businessId
       };
     }
   }
@@ -171,6 +182,7 @@ export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
     topProducts,
     recentOrders: (recentResult.data ?? []) as any[],
     products: productsResult.data ?? [],
-    businessName: currentBiz?.name || 'Negocio'
+    businessName: currentBiz?.name || 'Negocio',
+    businessId
   };
 }
