@@ -214,10 +214,36 @@ export async function createProduct(product: Partial<Product>) {
     if (!supabase) throw new Error('No se pudo conectar con la base de datos (Supabase)');
     if (!adminClient) throw new Error('Falta la variable SUPABASE_SERVICE_ROLE_KEY en el servidor.');
 
+    if (!product.businessId) {
+      throw new Error('No se recibió businessId para crear el producto');
+    }
+
+    let businessId = product.businessId;
+
+    // Permite recibir UUID o slug desde el dashboard.
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(product.businessId);
+    if (!isUUID) {
+      const { data: biz, error: bizError } = await supabase
+        .from('businesses')
+        .select('id')
+        .eq('slug', product.businessId)
+        .maybeSingle();
+
+      if (bizError) {
+        throw new Error(`No se pudo resolver el negocio por slug: ${bizError.message}`);
+      }
+
+      if (!biz?.id) {
+        throw new Error(`No existe un negocio con slug "${product.businessId}"`);
+      }
+
+      businessId = biz.id;
+    }
+
     const { data, error } = await supabase
       .from('products')
       .insert({
-        business_id: product.businessId,
+        business_id: businessId,
         category: product.category,
         name: product.name,
         price: product.price,
