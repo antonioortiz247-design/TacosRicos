@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/lib/supabase';
+import { getConfiguredBusinessIdentifier } from '@/lib/business-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,10 +18,10 @@ export async function GET(request: Request) {
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const businessId = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_ID;
+  const businessId = getConfiguredBusinessIdentifier();
 
   if (!businessId) {
-    return NextResponse.json({ ok: false, error: 'Business ID not configured' }, { status: 400 });
+    return NextResponse.json({ ok: false, error: 'Business ID/slug not configured' }, { status: 400 });
   }
 
   const [salesResult, ordersResult] = await Promise.all([

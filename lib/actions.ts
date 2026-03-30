@@ -109,7 +109,7 @@ export async function seedProducts(businessIdOrSlug: string) {
 
     // Validar que el identificador no sea un token filtrado
     if (businessIdOrSlug.startsWith('eyJ') || businessIdOrSlug.length > 50) {
-      throw new Error('El ID de negocio parece ser un token de seguridad (JWT) en lugar de un nombre o UUID. Por favor revisa la variable NEXT_PUBLIC_DEFAULT_BUSINESS_ID en Vercel.');
+      throw new Error('El ID de negocio parece ser un token de seguridad (JWT). En Vercel usa NEXT_PUBLIC_DEFAULT_BUSINESS_ID (UUID) o NEXT_PUBLIC_DEFAULT_BUSINESS_SLUG (slug legible).');
     }
 
     let businessId = businessIdOrSlug;

@@ -4,16 +4,17 @@ import { Header } from '@/components/Header';
 import { getOwnerDashboardMetrics } from '@/lib/admin-queries';
 import { RealtimeOrders } from '@/components/RealtimeOrders';
 import { ProductPriceManager } from '@/components/ProductPriceManager';
+import { getConfiguredBusinessIdentifier } from '@/lib/business-config';
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
   // En una versión final, esto vendría del perfil del usuario logueado
-  const businessId = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_ID || '';
+  const businessId = getConfiguredBusinessIdentifier();
   
   try {
     if (!businessId) {
-      throw new Error('ID de negocio no configurado. Por favor añade NEXT_PUBLIC_DEFAULT_BUSINESS_ID a tus variables de entorno.');
+      throw new Error('ID/slug de negocio no configurado. Define NEXT_PUBLIC_DEFAULT_BUSINESS_ID o NEXT_PUBLIC_DEFAULT_BUSINESS_SLUG en Vercel.');
     }
 
     // Obtener métricas y productos reales del negocio
