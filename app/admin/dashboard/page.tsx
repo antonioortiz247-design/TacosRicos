@@ -9,15 +9,15 @@ export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
   // En una versión final, esto vendría del perfil del usuario logueado
-  const businessId = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_ID || '';
+  const businessIdentifier = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_ID || '';
 
   try {
-    if (!businessId) {
+    if (!businessIdentifier) {
       throw new Error('ID de negocio no configurado. Por favor añade NEXT_PUBLIC_DEFAULT_BUSINESS_ID a tus variables de entorno.');
     }
 
     // Obtener métricas y productos reales del negocio
-    const metrics = await getOwnerDashboardMetrics(businessId);
+    const metrics = await getOwnerDashboardMetrics(businessIdentifier);
 
     return (
       <main className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -35,10 +35,10 @@ export default async function DashboardPage() {
             <div className="space-y-4">
               <AdminPanel metrics={metrics} />
               <AdminLiveQueriesPanel />
-              <RealtimeOrders initialOrders={metrics.recentOrders} businessId={businessId} />
+              <RealtimeOrders initialOrders={metrics.recentOrders} businessId={businessIdentifier} />
             </div>
             <div className="space-y-4">
-              <ProductPriceManager products={metrics.products as any} businessId={businessId} />
+              <ProductPriceManager products={metrics.products as any} businessId={businessIdentifier} />
             </div>
           </div>
         </div>
