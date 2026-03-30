@@ -1,6 +1,7 @@
 import { EventForm } from '@/components/EventForm';
 import { FooterActions } from '@/components/FooterActions';
 import { Header } from '@/components/Header';
+import { buildPathWithNegocio } from '@/lib/business-config';
 
 export default function EventosPage({ params }: { params: { negocio: string } }) {
   return (
@@ -16,7 +17,7 @@ export default function EventosPage({ params }: { params: { negocio: string } })
         <EventForm waPhone="5215512345678" />
       </section>
 
-      <FooterActions dashboardHref={`/admin/login?negocio=${encodeURIComponent(params.negocio)}`} />
+      <FooterActions dashboardHref={buildPathWithNegocio('/admin/login', params.negocio)} />
     </main>
   );
 }

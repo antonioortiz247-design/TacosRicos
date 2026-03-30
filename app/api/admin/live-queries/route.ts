@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/lib/supabase';
-import { getConfiguredBusinessIdentifier } from '@/lib/business-config';
+import { getRequestedOrConfiguredBusinessIdentifier } from '@/lib/business-config';
 import { resolveBusinessId } from '@/lib/admin-queries';
 
 export const dynamic = 'force-dynamic';
@@ -20,8 +20,8 @@ export async function GET(request: Request) {
 
   const today = new Date().toISOString().slice(0, 10);
   const { searchParams } = new URL(request.url);
-  const requestedBusiness = (searchParams.get('negocio') || '').trim();
-  const businessId = await resolveBusinessId(requestedBusiness || getConfiguredBusinessIdentifier());
+  const businessIdentifier = getRequestedOrConfiguredBusinessIdentifier(searchParams.get('negocio'));
+  const businessId = await resolveBusinessId(businessIdentifier);
 
   if (!businessId) {
     return NextResponse.json({ ok: true, salesToday: 0, ordersToday: 0, avgTicket: 0 });

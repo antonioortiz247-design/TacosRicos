@@ -4,18 +4,16 @@ import { Header } from '@/components/Header';
 import { getOwnerDashboardMetrics } from '@/lib/admin-queries';
 import { RealtimeOrders } from '@/components/RealtimeOrders';
 import { ProductPriceManager } from '@/components/ProductPriceManager';
-import { getConfiguredBusinessIdentifier } from '@/lib/business-config';
+import { getRequestedOrConfiguredBusinessIdentifier, normalizeBusinessIdentifier } from '@/lib/business-config';
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage({ searchParams }: { searchParams?: { negocio?: string } }) {
-  // En una versión final, esto vendría del perfil del usuario logueado
-  const configuredBusinessId = getConfiguredBusinessIdentifier();
-  const requestedBusiness = searchParams?.negocio?.trim() || '';
+  const requestedBusiness = normalizeBusinessIdentifier(searchParams?.negocio);
+  const businessIdentifier = getRequestedOrConfiguredBusinessIdentifier(requestedBusiness);
   
   try {
-    // Obtener métricas y productos reales del negocio
-    const metrics = await getOwnerDashboardMetrics(requestedBusiness || configuredBusinessId);
+    const metrics = await getOwnerDashboardMetrics(businessIdentifier);
 
     return (
       <main className="mx-auto min-h-screen max-w-6xl p-4">

@@ -1,18 +1,19 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { buildPathWithNegocio, normalizeBusinessIdentifier } from '@/lib/business-config';
 
 async function loginAction(formData: FormData) {
   'use server';
 
   const username = String(formData.get('username') ?? '');
   const password = String(formData.get('password') ?? '');
-  const negocio = String(formData.get('negocio') ?? '').trim();
+  const negocio = normalizeBusinessIdentifier(String(formData.get('negocio') ?? ''));
 
   const adminUser = process.env.ADMIN_USER ?? 'admin';
   const adminPassword = process.env.ADMIN_PASSWORD ?? 'admin123';
 
   if (username !== adminUser || password !== adminPassword) {
-    const retryPath = negocio ? `/admin/login?error=1&negocio=${encodeURIComponent(negocio)}` : '/admin/login?error=1';
+    const retryPath = `${buildPathWithNegocio('/admin/login', negocio)}${negocio ? '&' : '?'}error=1`;
     redirect(retryPath);
   }
 
@@ -23,13 +24,12 @@ async function loginAction(formData: FormData) {
     path: '/'
   });
 
-  const dashboardPath = negocio ? `/admin/dashboard?negocio=${encodeURIComponent(negocio)}` : '/admin/dashboard';
-  redirect(dashboardPath);
+  redirect(buildPathWithNegocio('/admin/dashboard', negocio));
 }
 
 export default async function AdminLoginPage({ searchParams }: { searchParams: { error?: string; negocio?: string } }) {
   const hasError = searchParams.error === '1';
-  const negocio = searchParams.negocio || '';
+  const negocio = normalizeBusinessIdentifier(searchParams.negocio);
 
   return (
     <main className="mx-auto grid min-h-screen max-w-md place-items-center p-4">

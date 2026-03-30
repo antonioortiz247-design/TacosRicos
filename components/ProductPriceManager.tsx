@@ -34,7 +34,6 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
       });
       if (result.success) {
         setProducts(prev => [...prev, result.product as any]);
-        setIsAdding(false);
         setNewProduct({ name: '', price: 0, category: 'tacos', description: '', imageUrl: '' });
       } else {
         alert('Error: ' + result.error);
