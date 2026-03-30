@@ -1,10 +1,12 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { buildPathWithNegocio, normalizeBusinessIdentifier } from '@/lib/business-config';
 
 async function loginAction(formData: FormData) {
   'use server';
 
   const password = String(formData.get('password') ?? '');
+  const negocio = normalizeBusinessIdentifier(String(formData.get('negocio') ?? ''));
 
   const adminPassword = process.env.ADMIN_PASSWORD ?? 'admin123';
 
@@ -19,11 +21,12 @@ async function loginAction(formData: FormData) {
     path: '/'
   });
 
-  redirect('/admin/dashboard');
+  redirect(buildPathWithNegocio('/admin/dashboard', negocio));
 }
 
-export default async function AdminLoginPage({ searchParams }: { searchParams: { error?: string } }) {
+export default async function AdminLoginPage({ searchParams }: { searchParams: { error?: string; negocio?: string } }) {
   const hasError = searchParams.error === '1';
+  const negocio = normalizeBusinessIdentifier(searchParams.negocio);
 
   return (
     <main className="mx-auto grid min-h-screen max-w-md place-items-center p-4">
@@ -35,6 +38,7 @@ export default async function AdminLoginPage({ searchParams }: { searchParams: {
         <p className="mt-1 text-sm text-zinc-500">Ingresa tu contraseña para abrir el dashboard del dueño.</p>
 
         <form action={loginAction} className="mt-4 space-y-3">
+          <input type="hidden" name="negocio" value={negocio} />
           <div>
             <label className="mb-1 block text-sm font-medium">Contraseña</label>
             <input
