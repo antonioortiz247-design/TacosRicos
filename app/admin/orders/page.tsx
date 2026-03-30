@@ -1,13 +1,12 @@
 import { Header } from '@/components/Header';
 import { OrdersPanel } from '@/components/OrdersPanel';
 import { getBusinessOrders } from '@/lib/admin-queries';
-import { getRequestedOrConfiguredBusinessIdentifier } from '@/lib/business-config';
 
 export const dynamic = 'force-dynamic';
 
-export default async function OrdersPage({ searchParams }: { searchParams?: { negocio?: string } }) {
-  const businessIdentifier = getRequestedOrConfiguredBusinessIdentifier(searchParams?.negocio);
-  const orders = await getBusinessOrders(businessIdentifier);
+export default async function OrdersPage() {
+  const businessId = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_ID || '';
+  const orders = await getBusinessOrders(businessId);
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl p-4">

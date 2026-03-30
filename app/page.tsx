@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { ArrowRight, Star, Clock, MapPin } from 'lucide-react';
 
 export default function HomePage() {
-  const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_SLUG || 'obwzuckfjmayluwmyjqu';
+  const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_SLUG || 'tacos-ricos';
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-12 lg:py-24">
