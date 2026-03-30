@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { updateProductPrice, seedProducts, createProduct } from '@/lib/actions';
+import { updateProductPrice, seedProducts, createProduct, deleteProduct } from '@/lib/actions';
 import { Product, ProductCategory } from '@/lib/types';
-import { Save, Loader2, DollarSign, CheckCircle2, Search, Filter, Tag, PlusCircle, X } from 'lucide-react';
+import { Save, Loader2, DollarSign, CheckCircle2, Search, Filter, Tag, PlusCircle, X, Trash2 } from 'lucide-react';
 
 export function ProductPriceManager({ products: initialProducts, businessId }: { products: Product[], businessId?: string }) {
   const [products, setProducts] = useState(initialProducts);
@@ -19,7 +19,8 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
     name: '',
     price: 0,
     category: 'tacos' as ProductCategory,
-    description: ''
+    description: '',
+    imageUrl: ''
   });
 
   const handleAddProduct = async (e: React.FormEvent) => {
@@ -33,8 +34,7 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
       });
       if (result.success) {
         setProducts(prev => [...prev, result.product as any]);
-        setIsAdding(false);
-        setNewProduct({ name: '', price: 0, category: 'tacos', description: '' });
+        setNewProduct({ name: '', price: 0, category: 'tacos', description: '', imageUrl: '' });
       } else {
         alert('Error: ' + result.error);
       }
@@ -43,6 +43,16 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
     } finally {
       setIsAdding(false);
     }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('¿Eliminar este producto del menú?')) return;
+    const result = await deleteProduct(id);
+    if (!result.success) {
+      alert(`No se pudo eliminar: ${result.error}`);
+      return;
+    }
+    setProducts(prev => prev.filter(p => p.id !== id));
   };
 
   const handleSeed = async () => {
@@ -127,9 +137,9 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
           <div>
             <h2 className="text-xl font-bold text-zinc-800 dark:text-zinc-100 flex items-center gap-2">
               <DollarSign size={22} className="text-emerald-600" />
-              Editor de Precios
+              Editor de Menú
             </h2>
-            <p className="text-sm text-zinc-500 mt-1">Actualiza los precios de tu menú en tiempo real</p>
+            <p className="text-sm text-zinc-500 mt-1">Agrega productos con imagen, ajusta precios y elimina artículos</p>
           </div>
           <div className="flex items-center gap-2">
             {products.length === 0 && (
@@ -193,6 +203,27 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
                 Guardar Nuevo Producto
               </button>
             </div>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <input
+                placeholder="URL de imagen (https://...)"
+                value={newProduct.imageUrl}
+                onChange={e => setNewProduct(prev => ({ ...prev, imageUrl: e.target.value }))}
+                className="rounded-lg border border-warm-100 bg-warm-50/30 px-3 py-2 text-sm focus:border-warm-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
+              />
+              <p className="rounded-lg border border-dashed border-warm-200 px-3 py-2 text-xs text-zinc-500 dark:border-zinc-700">
+                Usa URL pública de imagen para evitar límites de carga (ej: Supabase Storage o Cloudinary).
+              </p>
+            </div>
+            {newProduct.imageUrl && (
+              <div className="mt-3">
+                <p className="mb-1 text-xs text-zinc-500">Vista previa:</p>
+                <img
+                  src={newProduct.imageUrl}
+                  alt="Vista previa"
+                  className="h-24 w-24 rounded-lg border border-warm-100 object-cover"
+                />
+              </div>
+            )}
           </form>
         )}
 
@@ -228,6 +259,7 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
           <thead className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm text-zinc-500 dark:bg-zinc-900/95">
             <tr>
               <th className="border-b border-warm-50 px-6 py-4 font-semibold dark:border-zinc-800">Producto</th>
+              <th className="border-b border-warm-50 px-6 py-4 font-semibold dark:border-zinc-800">Imagen</th>
               <th className="border-b border-warm-50 px-6 py-4 font-semibold text-right dark:border-zinc-800">Precio ($)</th>
               <th className="border-b border-warm-50 px-6 py-4 font-semibold text-center dark:border-zinc-800">Acción</th>
             </tr>
@@ -246,6 +278,17 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
                     </span>
                   </div>
                 </td>
+                <td className="px-6 py-4">
+                  {product.imageUrl ? (
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="h-12 w-12 rounded-lg border border-warm-100 object-cover"
+                    />
+                  ) : (
+                    <span className="text-xs text-zinc-400">Sin imagen</span>
+                  )}
+                </td>
                 <td className="px-6 py-4 text-right">
                   <div className="inline-flex items-center rounded-xl border-2 border-warm-100 bg-white focus-within:border-warm-500 focus-within:ring-2 focus-within:ring-warm-500/20 dark:border-zinc-700 dark:bg-zinc-800 transition-all shadow-sm">
                     <span className="pl-3 text-zinc-400 font-medium">$</span>
@@ -260,26 +303,35 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
                   </div>
                 </td>
                 <td className="px-6 py-4 text-center">
-                  <button
-                    onClick={() => handleSave(product.id, product.price)}
-                    disabled={updatingId === product.id}
-                    className={`inline-flex items-center justify-center gap-2 rounded-xl min-w-[100px] px-4 py-2.5 text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 ${
-                      successId === product.id
-                        ? 'bg-emerald-500 text-white shadow-emerald-200'
-                        : updatingId === product.id
-                        ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
-                        : 'bg-warm-600 text-white hover:bg-warm-700 hover:shadow-md'
-                    }`}
-                  >
-                    {successId === product.id ? (
-                      <CheckCircle2 size={16} />
-                    ) : updatingId === product.id ? (
-                      <Loader2 size={16} className="animate-spin" />
-                    ) : (
-                      <Save size={16} />
-                    )}
-                    <span>{successId === product.id ? 'OK' : updatingId === product.id ? '...' : 'Guardar'}</span>
-                  </button>
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => handleSave(product.id, product.price)}
+                      disabled={updatingId === product.id}
+                      className={`inline-flex items-center justify-center gap-2 rounded-xl min-w-[100px] px-4 py-2.5 text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 ${
+                        successId === product.id
+                          ? 'bg-emerald-500 text-white shadow-emerald-200'
+                          : updatingId === product.id
+                          ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
+                          : 'bg-warm-600 text-white hover:bg-warm-700 hover:shadow-md'
+                      }`}
+                    >
+                      {successId === product.id ? (
+                        <CheckCircle2 size={16} />
+                      ) : updatingId === product.id ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <Save size={16} />
+                      )}
+                      <span>{successId === product.id ? 'OK' : updatingId === product.id ? '...' : 'Guardar'}</span>
+                    </button>
+                    <button
+                      onClick={() => void handleDelete(product.id)}
+                      className="inline-flex items-center justify-center rounded-xl border border-red-200 p-2 text-red-600 hover:bg-red-50"
+                      title="Eliminar producto"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
