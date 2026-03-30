@@ -4,20 +4,17 @@ import { Header } from '@/components/Header';
 import { getOwnerDashboardMetrics } from '@/lib/admin-queries';
 import { RealtimeOrders } from '@/components/RealtimeOrders';
 import { ProductPriceManager } from '@/components/ProductPriceManager';
+import { getConfiguredBusinessIdentifier } from '@/lib/business-config';
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
   // En una versión final, esto vendría del perfil del usuario logueado
-  const businessId = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_ID || '';
+  const configuredBusinessId = getConfiguredBusinessIdentifier();
   
   try {
-    if (!businessId) {
-      throw new Error('ID de negocio no configurado. Por favor añade NEXT_PUBLIC_DEFAULT_BUSINESS_ID a tus variables de entorno.');
-    }
-
     // Obtener métricas y productos reales del negocio
-    const metrics = await getOwnerDashboardMetrics(businessId);
+    const metrics = await getOwnerDashboardMetrics(configuredBusinessId);
 
     return (
       <main className="mx-auto min-h-screen max-w-6xl p-4">
@@ -34,10 +31,10 @@ export default async function DashboardPage() {
           <div className="space-y-4">
             <AdminPanel metrics={metrics} />
             <AdminLiveQueriesPanel />
-            <RealtimeOrders initialOrders={metrics.recentOrders} businessId={businessId} />
+            <RealtimeOrders initialOrders={metrics.recentOrders} businessId={metrics.businessId} />
           </div>
           <div className="space-y-4">
-            <ProductPriceManager products={metrics.products as any} businessId={businessId} />
+            <ProductPriceManager products={metrics.products as any} businessId={metrics.businessId} />
           </div>
         </div>
       </main>
