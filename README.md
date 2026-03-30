@@ -13,7 +13,6 @@ PWA mobile-first para taquería con pedidos por WhatsApp, personalización de ta
 
 - `/{negocio}/menu`
 - `/{negocio}/eventos`
-- `/admin/dashboard`
 - `/admin/orders`
 - `/admin/menu`
 - `/admin/settings`
@@ -33,6 +32,8 @@ npm run dev
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_DEFAULT_BUSINESS_ID` (UUID de `businesses.id`)
+- `NEXT_PUBLIC_DEFAULT_BUSINESS_SLUG` (fallback legible; opcional)
 - `MERCADO_PAGO_ACCESS_TOKEN`
 - `NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY`
 - `NEXT_PUBLIC_WA_PHONE`
@@ -51,5 +52,5 @@ npm run dev
 - Carrito sin pedido mínimo.
 - Delivery por zonas con dirección y referencias.
 - Pago con efectivo, transferencia y tarjeta (Mercado Pago).
-- Dashboard dueño y panel de pedidos.
+- Panel de pedidos para administración.
 - PWA instalable con `manifest` + `next-pwa`.
