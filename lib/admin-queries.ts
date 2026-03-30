@@ -2,6 +2,44 @@ import { getSupabaseClient } from './supabase';
 
 export const SALES_QUERY_SQL = 'SELECT SUM(total) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
 export const ORDERS_QUERY_SQL = 'SELECT COUNT(*) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function mapProductRow(row: any) {
+  return {
+    id: row.id,
+    businessId: row.business_id,
+    category: row.category,
+    name: row.name,
+    description: row.description ?? undefined,
+    price: Number(row.price),
+    imageUrl: row.image_url ?? undefined,
+    active: Boolean(row.active),
+    customizable: row.customizable ?? true,
+    stock: row.stock ?? undefined
+  };
+}
+
+export async function resolveBusinessId(businessIdOrSlug?: string | null): Promise<string | null> {
+  const supabase = getSupabaseClient();
+  if (!supabase || !businessIdOrSlug) return null;
+
+  if (UUID_REGEX.test(businessIdOrSlug)) {
+    return businessIdOrSlug;
+  }
+
+  const { data: biz, error } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('slug', businessIdOrSlug)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error resolving business slug:', error);
+    return null;
+  }
+
+  return biz?.id ?? null;
+}
 
 function mapProductRow(row: any) {
   return {
@@ -133,18 +171,45 @@ export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
     };
   }
 
-  const businessId = await resolveBusinessId(businessIdOrSlug);
-  if (!businessId) {
-    return {
-      sales: 0,
-      orders: 0,
-      avgTicket: 0,
-      topProducts: 'Negocio no encontrado',
-      recentOrders: [],
-      products: [],
-      businessName: 'No configurado',
-      businessId: ''
-    };
+  let businessId = businessIdOrSlug;
+
+  // Si no es un UUID válido, intentamos buscarlo como slug
+  const isUUID = UUID_REGEX.test(businessIdOrSlug);
+  
+  if (!isUUID && businessIdOrSlug) {
+    console.log(`Buscando negocio por slug: ${businessIdOrSlug}`);
+    const { data: biz, error: bizError } = await supabase
+      .from('businesses')
+      .select('id, name')
+      .eq('slug', businessIdOrSlug)
+      .single();
+    
+    if (bizError) {
+      console.error('Error al buscar negocio por slug:', bizError);
+    }
+
+    if (biz) {
+      businessId = biz.id;
+      console.log(`Negocio encontrado: ${biz.name} (${biz.id})`);
+    } else {
+      // Si no se encuentra por slug, intentamos buscar el primer negocio disponible como fallback
+      console.warn(`No se encontró negocio para el slug: ${businessIdOrSlug}. Intentando obtener el primer negocio...`);
+      const { data: allBiz } = await supabase.from('businesses').select('id, name').limit(1);
+      if (allBiz && allBiz.length > 0) {
+        businessId = allBiz[0].id;
+        console.log(`Usando negocio fallback: ${allBiz[0].name} (${allBiz[0].id})`);
+      } else {
+        return {
+          sales: 0,
+          orders: 0,
+          avgTicket: 0,
+          topProducts: 'Negocio no encontrado',
+          recentOrders: [],
+          products: [],
+          businessName: 'No configurado'
+        };
+      }
+    }
   }
 
   const today = new Date().toISOString().slice(0, 10);
@@ -197,7 +262,6 @@ export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
     topProducts,
     recentOrders: (recentResult.data ?? []) as any[],
     products: (productsResult.data ?? []).map(mapProductRow),
-    businessName: currentBiz?.name || 'Negocio',
-    businessId
+    businessName: currentBiz?.name || 'Negocio'
   };
 }
