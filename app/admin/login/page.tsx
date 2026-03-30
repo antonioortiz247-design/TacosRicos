@@ -38,7 +38,6 @@ export default async function AdminLoginPage({ searchParams }: { searchParams: {
         <p className="mt-1 text-sm text-zinc-500">Ingresa tu contraseña para abrir el dashboard del dueño.</p>
 
         <form action={loginAction} className="mt-4 space-y-3">
-          <input type="hidden" name="negocio" value={negocio} />
           <div>
             <label className="mb-1 block text-sm font-medium">Contraseña</label>
             <input
