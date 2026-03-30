@@ -64,9 +64,10 @@ export async function createOrder(params: OrderInput) {
     if (itemsError) throw itemsError;
 
     return { success: true, orderId: order.id };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating order:', error);
-    return { success: false, error: 'No se pudo crear el pedido' };
+    const errorMessage = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
+    return { success: false, error: `Error al crear el pedido: ${errorMessage}` };
   }
 }
 

@@ -16,6 +16,7 @@ export default async function DashboardPage() {
       throw new Error('ID de negocio no configurado. Por favor añade NEXT_PUBLIC_DEFAULT_BUSINESS_ID a tus variables de entorno.');
     }
 
+    // Obtener métricas y productos reales del negocio
     const metrics = await getOwnerDashboardMetrics(businessId);
 
     return (
