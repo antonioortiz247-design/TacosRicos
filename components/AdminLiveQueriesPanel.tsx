@@ -8,7 +8,7 @@ type LiveData = {
   avgTicket: number;
 };
 
-export function AdminLiveQueriesPanel() {
+export function AdminLiveQueriesPanel({ negocio }: { negocio?: string }) {
   const [data, setData] = useState<LiveData | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,8 @@ export function AdminLiveQueriesPanel() {
     setError('');
 
     try {
-      const response = await fetch('/api/admin/live-queries', { cache: 'no-store' });
+      const query = negocio ? `?negocio=${encodeURIComponent(negocio)}` : '';
+      const response = await fetch(`/api/admin/live-queries${query}`, { cache: 'no-store' });
       const payload = await response.json();
 
       if (!response.ok || !payload.ok) {
@@ -35,7 +36,7 @@ export function AdminLiveQueriesPanel() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [negocio]);
 
   useEffect(() => {
     void load();

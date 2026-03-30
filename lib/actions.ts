@@ -109,7 +109,7 @@ export async function seedProducts(businessIdOrSlug: string) {
 
     // Validar que el identificador no sea un token filtrado
     if (businessIdOrSlug.startsWith('eyJ') || businessIdOrSlug.length > 50) {
-      throw new Error('El ID de negocio parece ser un token de seguridad (JWT) en lugar de un nombre o UUID. Por favor revisa la variable NEXT_PUBLIC_DEFAULT_BUSINESS_ID en Vercel.');
+      throw new Error('El ID de negocio parece ser un token de seguridad (JWT). En Vercel usa NEXT_PUBLIC_DEFAULT_BUSINESS_ID (UUID) o NEXT_PUBLIC_DEFAULT_BUSINESS_SLUG (slug legible).');
     }
 
     let businessId = businessIdOrSlug;
@@ -234,8 +234,21 @@ export async function createProduct(product: Partial<Product>) {
       throw error;
     }
     
+    const normalizedProduct = {
+      id: data.id,
+      businessId: data.business_id,
+      category: data.category,
+      name: data.name,
+      description: data.description || undefined,
+      price: Number(data.price || 0),
+      imageUrl: data.image_url || undefined,
+      active: data.active,
+      customizable: data.customizable,
+      stock: data.stock
+    };
+
     console.log('Producto creado con éxito:', data.id);
-    return { success: true, product: data };
+    return { success: true, product: normalizedProduct };
   } catch (error: any) {
     console.error('Excepción en createProduct:', error);
     let errorMessage = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
@@ -244,6 +257,34 @@ export async function createProduct(product: Partial<Product>) {
       errorMessage = 'Error: La tabla de productos no existe. Ejecuta el SQL de "supabase/schema.sql" en Supabase.';
     }
     
+    return { success: false, error: errorMessage };
+  }
+}
+
+export async function deleteProduct(productId: string) {
+  try {
+    const { getSupabaseAdmin, getSupabaseClient } = await import('./supabase');
+    const adminClient = getSupabaseAdmin();
+    const publicClient = getSupabaseClient();
+    const supabase = adminClient || publicClient;
+
+    if (!supabase) throw new Error('No se pudo conectar con la base de datos (Supabase)');
+    if (!adminClient) throw new Error('Falta la variable SUPABASE_SERVICE_ROLE_KEY en el servidor.');
+
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', productId);
+
+    if (error) {
+      console.error('Error de Supabase al eliminar producto:', error);
+      throw error;
+    }
+
+    return { success: true };
+  } catch (error: any) {
+    console.error('Excepción en deleteProduct:', error);
+    const errorMessage = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
     return { success: false, error: errorMessage };
   }
 }
