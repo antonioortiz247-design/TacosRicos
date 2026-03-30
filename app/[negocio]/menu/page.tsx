@@ -5,13 +5,15 @@ import { Header } from '@/components/Header';
 import { MenuList } from '@/components/MenuList';
 import { PaymentSelector } from '@/components/PaymentSelector';
 import { Product } from '@/lib/types';
+import { getBusinessBySlug, getBusinessProducts, getBusinessSettings } from '@/lib/admin-queries';
+import { redirect } from 'next/navigation';
 
 const baseProducts = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile Relleno', 'Campechanos', 'Chorizo Argentino', 'Chuleta'];
 
 const fallbackProducts: Product[] = [
   ...baseProducts.map((name, idx) => ({
     id: `t-${idx + 1}`,
-    businessId: 'demo',
+    businessId: 'default',
     category: 'tacos' as const,
     name,
     price: 32,
@@ -21,23 +23,44 @@ const fallbackProducts: Product[] = [
     imageUrl: name === 'Pechuga' ? '/TacodePechuga.png' : undefined,
     imageUrl: nombre === 'Suadero' ? '/TacodeSuadero.png' : undefined,
   })),
-  { id: 'e-1', businessId: 'demo', category: 'especialidades', name: 'Burrito', price: 100, active: true, customizable: true, imageUrl: nombre === 'Suadero' ? '/TacodeSuadero.png' : undefined, },
-  { id: 'e-2', businessId: 'demo', category: 'especialidades', name: 'Gringas', price: 70, active: true, customizable: true },
-  { id: 'v-1', businessId: 'demo', category: 'viernes', name: 'Quesadillas de camarón', price: 40, active: true },
-  { id: 'm-1', businessId: 'demo', category: 'miercoles', name: 'Papas rellenas', price: 90, active: true },
   {
-    id: 'j-1',
-    businessId: 'demo',
-    category: 'jueves',
-    name: 'Pescado rebozado',
-    price: 120,
-    description: 'Precio editable en admin',
+    id: 'e-1',
+    businessId: 'default',
+    category: 'especialidades',
+    name: 'Burrito',
+    price: 100,
     active: true,
+    customizable: true,
+    imageUrl: getProductImageUrl('Burrito')
   },
+  {
+    id: 'e-2',
+    businessId: 'default',
+    category: 'especialidades',
+    name: 'Gringas',
+    price: 70,
+    active: true,
+    customizable: true,
+    imageUrl: getProductImageUrl('Gringas')
+  }
 ];
 
-export default function BusinessMenuPage({ params }: { params: { negocio: string } }) {
-  const businessDisplayName = params.negocio.toLowerCase() === 'demo' ? 'Tacos Rico´s' : `Taquería ${params.negocio}`;
+export default async function BusinessMenuPage({ params }: { params: { negocio: string } }) {
+  // Intentar obtener el negocio real desde la base de datos
+  const business = await getBusinessBySlug(params.negocio);
+  
+  // Obtener configuración del negocio (teléfono de WhatsApp)
+  const settings = business ? await getBusinessSettings(business.id) : null;
+  const waPhone = settings?.whatsapp_number || process.env.NEXT_PUBLIC_WA_PHONE || "5586495622";
+
+  const businessDisplayName = business?.name || (params.negocio === 'tacos-ricos' ? 'Tacos Rico´s' : params.negocio);
+  const businessId = business?.id || params.negocio;
+
+  // Obtener productos desde la DB
+  let dbProducts = business ? await getBusinessProducts(business.id) : [];
+  
+  // SI NO HAY PRODUCTOS EN DB, usamos el fallback del demo para asegurar que siempre haya contenido
+  const products = dbProducts.length > 0 ? (dbProducts as any as Product[]) : fallbackProducts;
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl pb-24">
@@ -49,13 +72,13 @@ export default function BusinessMenuPage({ params }: { params: { negocio: string
             <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Menú del día</h2>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Selecciona tus favoritos, personaliza y confirma tu pedido en WhatsApp.</p>
           </div>
-          <MenuList products={fallbackProducts} />
+          <MenuList products={products} />
         </div>
 
         <div className="space-y-4 md:sticky md:top-[92px] md:self-start">
           <DeliverySelector />
           <PaymentSelector />
-          <Cart waPhone="5215512345678" businessName={businessDisplayName} />
+          <Cart waPhone={waPhone} businessName={businessDisplayName} businessId={businessId} />
         </div>
       </section>
 

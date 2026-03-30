@@ -3,7 +3,7 @@
 import { useCartStore } from '@/store/cart-store';
 
 export function DeliverySelector() {
-  const { deliveryType, setDelivery, address, setAddress, references, setReferences, zone } = useCartStore();
+  const { deliveryType, setDelivery, address, setAddress, address_references, setReferences, zone } = useCartStore();
 
   return (
     <section className="surface-card space-y-3">
@@ -35,7 +35,7 @@ export function DeliverySelector() {
             <option value="zona3">Zona 3 ($40)</option>
           </select>
           <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Dirección" className="input-field" />
-          <input value={references} onChange={(e) => setReferences(e.target.value)} placeholder="Referencias" className="input-field" />
+          <input value={address_references} onChange={(e) => setReferences(e.target.value)} placeholder="Referencias" className="input-field" />
         </div>
       ) : null}
     </section>
