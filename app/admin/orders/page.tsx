@@ -1,11 +1,12 @@
 import { Header } from '@/components/Header';
 import { OrdersPanel } from '@/components/OrdersPanel';
 import { getBusinessOrders } from '@/lib/admin-queries';
+import { getConfiguredBusinessIdentifier } from '@/lib/business-config';
 
 export const dynamic = 'force-dynamic';
 
 export default async function OrdersPage() {
-  const businessId = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_ID || '';
+  const businessId = getConfiguredBusinessIdentifier();
   const orders = await getBusinessOrders(businessId);
 
   return (
