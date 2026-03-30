@@ -24,8 +24,28 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
     name: '',
     price: 0,
     category: 'tacos' as ProductCategory,
-    description: ''
+    description: '',
+    imageUrl: ''
   });
+
+  const [imagePreview, setImagePreview] = useState<string>('');
+
+  const handleImageFile = (file?: File) => {
+    if (!file) return;
+    const maxFileSize = 1.5 * 1024 * 1024; // 1.5MB
+    if (file.size > maxFileSize) {
+      alert('La imagen es muy grande. Usa una imagen menor a 1.5MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : '';
+      setNewProduct((prev) => ({ ...prev, imageUrl: result }));
+      setImagePreview(result);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +59,8 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
       if (result.success) {
         setProducts(prev => [...prev, result.product as any]);
         setIsAdding(false);
-        setNewProduct({ name: '', price: 0, category: 'tacos', description: '' });
+        setNewProduct({ name: '', price: 0, category: 'tacos', description: '', imageUrl: '' });
+        setImagePreview('');
       } else {
         alert('Error: ' + result.error);
       }
@@ -156,7 +177,7 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
             )}
             <button 
               onClick={() => setIsAdding(!isAdding)}
-              className="inline-flex items-center gap-2 rounded-xl bg-warm-600 px-4 py-2 text-xs font-bold text-white hover:bg-warm-700"
+              className="inline-flex items-center gap-2 rounded-xl bg-yellow-400 px-4 py-2 text-xs font-bold text-zinc-900 hover:bg-yellow-500"
             >
               {isAdding ? <X size={16} /> : <PlusCircle size={16} />}
               {isAdding ? 'Cerrar' : 'Añadir Producto'}
@@ -205,6 +226,30 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
                 Guardar Nuevo Producto
               </button>
             </div>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <input
+                type="url"
+                placeholder="URL de imagen (opcional)"
+                value={newProduct.imageUrl}
+                onChange={(e) => {
+                  setNewProduct((prev) => ({ ...prev, imageUrl: e.target.value }));
+                  setImagePreview(e.target.value);
+                }}
+                className="rounded-lg border border-warm-100 bg-warm-50/30 px-3 py-2 text-sm focus:border-warm-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageFile(e.target.files?.[0])}
+                className="rounded-lg border border-warm-100 bg-warm-50/30 px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-900 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white dark:border-zinc-700 dark:bg-zinc-900"
+              />
+            </div>
+            {imagePreview ? (
+              <div className="mt-3">
+                <p className="mb-1 text-xs text-zinc-500">Vista previa de imagen</p>
+                <img src={imagePreview} alt="Vista previa" className="h-24 w-24 rounded-lg border object-cover" />
+              </div>
+            ) : null}
           </form>
         )}
 

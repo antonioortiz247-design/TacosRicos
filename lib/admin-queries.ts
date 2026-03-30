@@ -3,6 +3,21 @@ import { getSupabaseClient } from './supabase';
 export const SALES_QUERY_SQL = 'SELECT SUM(total) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
 export const ORDERS_QUERY_SQL = 'SELECT COUNT(*) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
 
+function mapProductRow(row: any) {
+  return {
+    id: row.id,
+    businessId: row.business_id,
+    category: row.category,
+    name: row.name,
+    description: row.description ?? undefined,
+    price: Number(row.price),
+    imageUrl: row.image_url ?? undefined,
+    active: Boolean(row.active),
+    customizable: row.customizable ?? true,
+    stock: row.stock ?? undefined
+  };
+}
+
 export async function getBusinessBySlug(slug: string) {
   const supabase = getSupabaseClient();
   if (!supabase) {
@@ -38,7 +53,7 @@ export async function getBusinessProducts(businessId: string) {
     console.error('Error fetching products:', error);
     return [];
   }
-  return data;
+  return (data ?? []).map(mapProductRow);
 }
 
 export async function getBusinessSettings(businessId: string) {
@@ -170,7 +185,7 @@ export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
     avgTicket,
     topProducts,
     recentOrders: (recentResult.data ?? []) as any[],
-    products: productsResult.data ?? [],
+    products: (productsResult.data ?? []).map(mapProductRow),
     businessName: currentBiz?.name || 'Negocio'
   };
 }

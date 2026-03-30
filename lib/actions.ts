@@ -261,7 +261,20 @@ export async function createProduct(product: Partial<Product>) {
     }
     
     console.log('Producto creado con éxito:', data.id);
-    return { success: true, product: data };
+    return {
+      success: true,
+      product: {
+        id: data.id,
+        businessId: data.business_id,
+        category: data.category,
+        name: data.name,
+        description: data.description ?? undefined,
+        price: Number(data.price),
+        imageUrl: data.image_url ?? undefined,
+        active: Boolean(data.active),
+        customizable: data.customizable ?? true
+      }
+    };
   } catch (error: any) {
     console.error('Excepción en createProduct:', error);
     let errorMessage = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
