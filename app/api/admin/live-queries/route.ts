@@ -19,7 +19,9 @@ export async function GET(request: Request) {
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const businessId = await resolveBusinessId(getConfiguredBusinessIdentifier());
+  const { searchParams } = new URL(request.url);
+  const requestedBusiness = (searchParams.get('negocio') || '').trim();
+  const businessId = await resolveBusinessId(requestedBusiness || getConfiguredBusinessIdentifier());
 
   if (!businessId) {
     return NextResponse.json({ ok: true, salesToday: 0, ordersToday: 0, avgTicket: 0 });

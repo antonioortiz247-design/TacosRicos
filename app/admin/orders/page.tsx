@@ -5,9 +5,10 @@ import { getConfiguredBusinessIdentifier } from '@/lib/business-config';
 
 export const dynamic = 'force-dynamic';
 
-export default async function OrdersPage() {
+export default async function OrdersPage({ searchParams }: { searchParams?: { negocio?: string } }) {
   const businessId = getConfiguredBusinessIdentifier();
-  const orders = await getBusinessOrders(businessId);
+  const requestedBusiness = searchParams?.negocio?.trim() || '';
+  const orders = await getBusinessOrders(requestedBusiness || businessId);
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl p-4">

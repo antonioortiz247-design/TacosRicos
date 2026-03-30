@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { updateProductPrice, seedProducts, createProduct, deleteProduct } from '@/lib/actions';
 import { Product, ProductCategory } from '@/lib/types';
-import { Save, Loader2, DollarSign, CheckCircle2, Search, Filter, Tag, PlusCircle, X, Trash2, ImagePlus } from 'lucide-react';
+import { Save, Loader2, DollarSign, CheckCircle2, Search, Filter, Tag, PlusCircle, X, Trash2 } from 'lucide-react';
 
 export function ProductPriceManager({ products: initialProducts, businessId }: { products: Product[], businessId?: string }) {
   const [products, setProducts] = useState(initialProducts);
@@ -44,30 +44,6 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
     } finally {
       setIsAdding(false);
     }
-  };
-
-  const handleImageUpload = async (file: File | undefined) => {
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      alert('Selecciona un archivo de imagen válido');
-      return;
-    }
-
-    if (file.size > 2 * 1024 * 1024) {
-      alert('La imagen es muy pesada. Usa una imagen menor a 2MB.');
-      return;
-    }
-
-    const toBase64 = () =>
-      new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result || ''));
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-
-    const base64 = await toBase64();
-    setNewProduct(prev => ({ ...prev, imageUrl: base64 }));
   };
 
   const handleDelete = async (id: string) => {
@@ -235,16 +211,9 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
                 onChange={e => setNewProduct(prev => ({ ...prev, imageUrl: e.target.value }))}
                 className="rounded-lg border border-warm-100 bg-warm-50/30 px-3 py-2 text-sm focus:border-warm-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
               />
-              <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-warm-300 px-3 py-2 text-sm font-semibold text-warm-700 hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900">
-                <ImagePlus size={16} />
-                Subir imagen (base64)
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={e => void handleImageUpload(e.target.files?.[0])}
-                />
-              </label>
+              <p className="rounded-lg border border-dashed border-warm-200 px-3 py-2 text-xs text-zinc-500 dark:border-zinc-700">
+                Usa URL pública de imagen para evitar límites de carga (ej: Supabase Storage o Cloudinary).
+              </p>
             </div>
             {newProduct.imageUrl && (
               <div className="mt-3">

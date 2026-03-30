@@ -8,13 +8,14 @@ import { getConfiguredBusinessIdentifier } from '@/lib/business-config';
 
 export const dynamic = 'force-dynamic';
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { searchParams?: { negocio?: string } }) {
   // En una versión final, esto vendría del perfil del usuario logueado
   const configuredBusinessId = getConfiguredBusinessIdentifier();
+  const requestedBusiness = searchParams?.negocio?.trim() || '';
   
   try {
     // Obtener métricas y productos reales del negocio
-    const metrics = await getOwnerDashboardMetrics(configuredBusinessId);
+    const metrics = await getOwnerDashboardMetrics(requestedBusiness || configuredBusinessId);
 
     return (
       <main className="mx-auto min-h-screen max-w-6xl p-4">
@@ -30,7 +31,7 @@ export default async function DashboardPage() {
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           <div className="space-y-4">
             <AdminPanel metrics={metrics} />
-            <AdminLiveQueriesPanel />
+            <AdminLiveQueriesPanel negocio={requestedBusiness} />
             <RealtimeOrders initialOrders={metrics.recentOrders} businessId={metrics.businessId} />
           </div>
           <div className="space-y-4">
