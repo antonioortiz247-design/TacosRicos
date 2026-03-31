@@ -95,10 +95,13 @@ export async function getBusinessSettings(businessId: string) {
 export async function getBusinessOrders(businessId: string) {
   const supabase = getSupabaseClient();
   if (!supabase) return [];
+  const resolvedBusinessId = await resolveBusinessId(businessId);
+  if (!resolvedBusinessId) return [];
+
   const { data, error } = await supabase
     .from('orders')
     .select('*')
-    .eq('business_id', businessId)
+    .eq('business_id', resolvedBusinessId)
     .order('created_at', { ascending: false });
   
   if (error) return [];
@@ -115,7 +118,8 @@ export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
       topProducts: 'Sin datos',
       recentOrders: [] as Array<{ id: string; total: number; status: string; created_at: string }>,
       products: [] as any[],
-      businessName: 'No conectado'
+      businessName: 'No conectado',
+      businessId: ''
     };
   }
 
@@ -180,7 +184,8 @@ export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
         topProducts: 'Base de datos no inicializada',
         recentOrders: [],
         products: [],
-        businessName: 'Error: Ejecuta el SQL en Supabase'
+        businessName: 'Error: Ejecuta el SQL en Supabase',
+        businessId
       };
     }
   }
