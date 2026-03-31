@@ -2,6 +2,44 @@ import { getSupabaseClient } from './supabase';
 
 export const SALES_QUERY_SQL = 'SELECT SUM(total) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
 export const ORDERS_QUERY_SQL = 'SELECT COUNT(*) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function mapProductRow(row: any) {
+  return {
+    id: row.id,
+    businessId: row.business_id,
+    category: row.category,
+    name: row.name,
+    description: row.description ?? undefined,
+    price: Number(row.price),
+    imageUrl: row.image_url ?? undefined,
+    active: Boolean(row.active),
+    customizable: row.customizable ?? true,
+    stock: row.stock ?? undefined
+  };
+}
+
+export async function resolveBusinessId(businessIdOrSlug?: string | null): Promise<string | null> {
+  const supabase = getSupabaseClient();
+  if (!supabase || !businessIdOrSlug) return null;
+
+  if (UUID_REGEX.test(businessIdOrSlug)) {
+    return businessIdOrSlug;
+  }
+
+  const { data: biz, error } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('slug', businessIdOrSlug)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error resolving business slug:', error);
+    return null;
+  }
+
+  return biz?.id ?? null;
+}
 
 export async function getBusinessBySlug(slug: string) {
   const supabase = getSupabaseClient();
@@ -13,13 +51,32 @@ export async function getBusinessBySlug(slug: string) {
     .from('businesses')
     .select('*')
     .eq('slug', slug)
-    .single();
+    .maybeSingle();
   
   if (error) {
     console.error('Error fetching business by slug:', error);
     return null;
   }
-  return data;
+
+  if (data) return data;
+
+  // Fallback de resiliencia: usar el primer negocio disponible para evitar mostrar demo innecesariamente.
+  const { data: firstBusiness, error: firstBusinessError } = await supabase
+    .from('businesses')
+    .select('*')
+    .limit(1)
+    .maybeSingle();
+
+  if (firstBusinessError) {
+    console.error('Error fetching fallback business:', firstBusinessError);
+    return null;
+  }
+
+  if (firstBusiness) {
+    console.warn(`No se encontró negocio con slug "${slug}". Usando fallback: ${firstBusiness.slug ?? firstBusiness.id}`);
+  }
+
+  return firstBusiness ?? null;
 }
 
 export async function getBusinessProducts(businessId: string) {
@@ -38,7 +95,7 @@ export async function getBusinessProducts(businessId: string) {
     console.error('Error fetching products:', error);
     return [];
   }
-  return data;
+  return (data ?? []).map(mapProductRow);
 }
 
 export async function getBusinessSettings(businessId: string) {
@@ -84,7 +141,7 @@ export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
   let businessId = businessIdOrSlug;
 
   // Si no es un UUID válido, intentamos buscarlo como slug
-  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(businessIdOrSlug);
+  const isUUID = UUID_REGEX.test(businessIdOrSlug);
   
   if (!isUUID && businessIdOrSlug) {
     console.log(`Buscando negocio por slug: ${businessIdOrSlug}`);
@@ -170,7 +227,7 @@ export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
     avgTicket,
     topProducts,
     recentOrders: (recentResult.data ?? []) as any[],
-    products: productsResult.data ?? [],
+    products: (productsResult.data ?? []).map(mapProductRow),
     businessName: currentBiz?.name || 'Negocio'
   };
 }
