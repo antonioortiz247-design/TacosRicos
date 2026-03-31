@@ -6,6 +6,7 @@ import { MenuList } from '@/components/MenuList';
 import { PaymentSelector } from '@/components/PaymentSelector';
 import { Product } from '@/lib/types';
 import { getBusinessBySlug, getBusinessProducts, getBusinessSettings } from '@/lib/admin-queries';
+import { buildPathWithNegocio } from '@/lib/business-config';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -109,7 +110,7 @@ export default async function BusinessMenuPage({ params }: { params: { negocio: 
         </div>
       </section>
 
-      <FooterActions dashboardHref="/admin/login" />
+      <FooterActions dashboardHref={buildPathWithNegocio('/admin/login', params.negocio)} />
     </main>
   );
 }
