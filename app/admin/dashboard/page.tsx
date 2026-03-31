@@ -4,6 +4,7 @@ import { Header } from '@/components/Header';
 import { getOwnerDashboardMetrics } from '@/lib/admin-queries';
 import { RealtimeOrders } from '@/components/RealtimeOrders';
 import { ProductPriceManager } from '@/components/ProductPriceManager';
+import { getRequestedOrConfiguredBusinessIdentifier, normalizeBusinessIdentifier } from '@/lib/business-config';
 
 export const dynamic = 'force-dynamic';
 
