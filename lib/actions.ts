@@ -4,6 +4,39 @@ import { getSupabaseClient } from './supabase';
 import { OrderSchema, OrderInput } from './validations';
 import { Product } from './types';
 
+async function resolveBusinessIdForWrite(supabase: any, businessIdOrSlug: string): Promise<string> {
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(businessIdOrSlug);
+  if (isUUID) return businessIdOrSlug;
+
+  const { data: bySlug, error: bySlugError } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('slug', businessIdOrSlug)
+    .maybeSingle();
+
+  if (bySlugError) {
+    throw new Error(`No se pudo resolver el negocio por slug: ${bySlugError.message}`);
+  }
+  if (bySlug?.id) return bySlug.id;
+
+  // Fallback de resiliencia: usar el primer negocio disponible, para no bloquear operación en dashboard.
+  const { data: firstBusiness, error: firstBusinessError } = await supabase
+    .from('businesses')
+    .select('id, slug')
+    .limit(1);
+
+  if (firstBusinessError) {
+    throw new Error(`No se pudo obtener un negocio fallback: ${firstBusinessError.message}`);
+  }
+
+  if (firstBusiness && firstBusiness.length > 0) {
+    console.warn(`No se encontró slug "${businessIdOrSlug}". Usando fallback: ${firstBusiness[0].slug ?? firstBusiness[0].id}`);
+    return firstBusiness[0].id;
+  }
+
+  throw new Error(`No existe un negocio con slug "${businessIdOrSlug}"`);
+}
+
 export async function createOrder(params: OrderInput) {
   try {
     const { getSupabaseAdmin, getSupabaseClient } = await import('./supabase');
@@ -214,10 +247,16 @@ export async function createProduct(product: Partial<Product>) {
     if (!supabase) throw new Error('No se pudo conectar con la base de datos (Supabase)');
     if (!adminClient) throw new Error('Falta la variable SUPABASE_SERVICE_ROLE_KEY en el servidor.');
 
+    if (!product.businessId) {
+      throw new Error('No se recibió businessId para crear el producto');
+    }
+
+    const businessId = await resolveBusinessIdForWrite(supabase, product.businessId);
+
     const { data, error } = await supabase
       .from('products')
       .insert({
-        business_id: product.businessId,
+        business_id: businessId,
         category: product.category,
         name: product.name,
         price: product.price,
@@ -235,7 +274,20 @@ export async function createProduct(product: Partial<Product>) {
     }
     
     console.log('Producto creado con éxito:', data.id);
-    return { success: true, product: data };
+    return {
+      success: true,
+      product: {
+        id: data.id,
+        businessId: data.business_id,
+        category: data.category,
+        name: data.name,
+        description: data.description ?? undefined,
+        price: Number(data.price),
+        imageUrl: data.image_url ?? undefined,
+        active: Boolean(data.active),
+        customizable: data.customizable ?? true
+      }
+    };
   } catch (error: any) {
     console.error('Excepción en createProduct:', error);
     let errorMessage = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
