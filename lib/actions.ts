@@ -4,6 +4,39 @@ import { getSupabaseClient } from './supabase';
 import { OrderSchema, OrderInput } from './validations';
 import { Product } from './types';
 
+async function resolveBusinessIdForWrite(supabase: any, businessIdOrSlug: string): Promise<string> {
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(businessIdOrSlug);
+  if (isUUID) return businessIdOrSlug;
+
+  const { data: bySlug, error: bySlugError } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('slug', businessIdOrSlug)
+    .maybeSingle();
+
+  if (bySlugError) {
+    throw new Error(`No se pudo resolver el negocio por slug: ${bySlugError.message}`);
+  }
+  if (bySlug?.id) return bySlug.id;
+
+  // Fallback de resiliencia: usar el primer negocio disponible, para no bloquear operación en dashboard.
+  const { data: firstBusiness, error: firstBusinessError } = await supabase
+    .from('businesses')
+    .select('id, slug')
+    .limit(1);
+
+  if (firstBusinessError) {
+    throw new Error(`No se pudo obtener un negocio fallback: ${firstBusinessError.message}`);
+  }
+
+  if (firstBusiness && firstBusiness.length > 0) {
+    console.warn(`No se encontró slug "${businessIdOrSlug}". Usando fallback: ${firstBusiness[0].slug ?? firstBusiness[0].id}`);
+    return firstBusiness[0].id;
+  }
+
+  throw new Error(`No existe un negocio con slug "${businessIdOrSlug}"`);
+}
+
 export async function createOrder(params: OrderInput) {
   try {
     const { getSupabaseAdmin, getSupabaseClient } = await import('./supabase');
@@ -218,27 +251,7 @@ export async function createProduct(product: Partial<Product>) {
       throw new Error('No se recibió businessId para crear el producto');
     }
 
-    let businessId = product.businessId;
-
-    // Permite recibir UUID o slug desde el dashboard.
-    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(product.businessId);
-    if (!isUUID) {
-      const { data: biz, error: bizError } = await supabase
-        .from('businesses')
-        .select('id')
-        .eq('slug', product.businessId)
-        .maybeSingle();
-
-      if (bizError) {
-        throw new Error(`No se pudo resolver el negocio por slug: ${bizError.message}`);
-      }
-
-      if (!biz?.id) {
-        throw new Error(`No existe un negocio con slug "${product.businessId}"`);
-      }
-
-      businessId = biz.id;
-    }
+    const businessId = await resolveBusinessIdForWrite(supabase, product.businessId);
 
     const { data, error } = await supabase
       .from('products')

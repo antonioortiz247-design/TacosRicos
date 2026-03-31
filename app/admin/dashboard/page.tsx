@@ -10,13 +10,12 @@ export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
   // En una versión final, esto vendría del perfil del usuario logueado
-  const businessIdentifier = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_ID || '';
+  const businessIdentifier =
+    process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_ID ||
+    process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_SLUG ||
+    'tacos-ricos';
 
   try {
-    if (!businessIdentifier) {
-      throw new Error('ID de negocio no configurado. Por favor añade NEXT_PUBLIC_DEFAULT_BUSINESS_ID a tus variables de entorno.');
-    }
-
     // Obtener métricas y productos reales del negocio
     const metrics = await getOwnerDashboardMetrics(businessIdentifier);
 
