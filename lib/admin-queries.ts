@@ -41,54 +41,6 @@ export async function resolveBusinessId(businessIdOrSlug?: string | null): Promi
   return biz?.id ?? null;
 }
 
-function mapProductRow(row: any) {
-  return {
-    id: row.id,
-    businessId: row.business_id,
-    category: row.category,
-    name: row.name,
-    description: row.description || undefined,
-    price: Number(row.price || 0),
-    imageUrl: row.image_url || undefined,
-    active: row.active,
-    customizable: row.customizable,
-    stock: row.stock
-  };
-}
-
-export async function resolveBusinessId(input: string) {
-  const supabase = getSupabaseClient();
-  if (!supabase) return null;
-
-  const normalized = input.trim();
-  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(normalized);
-
-  if (normalized && isUUID) {
-    return normalized;
-  }
-
-  if (normalized) {
-    const { data: bizBySlug } = await supabase
-      .from('businesses')
-      .select('id')
-      .eq('slug', normalized)
-      .maybeSingle();
-
-    if (bizBySlug?.id) {
-      return bizBySlug.id as string;
-    }
-  }
-
-  const { data: firstBusiness } = await supabase
-    .from('businesses')
-    .select('id')
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle();
-
-  return firstBusiness?.id ?? null;
-}
-
 export async function getBusinessBySlug(slug: string) {
   const supabase = getSupabaseClient();
   if (!supabase) {
