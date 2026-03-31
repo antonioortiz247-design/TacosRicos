@@ -51,13 +51,32 @@ export async function getBusinessBySlug(slug: string) {
     .from('businesses')
     .select('*')
     .eq('slug', slug)
-    .single();
+    .maybeSingle();
   
   if (error) {
     console.error('Error fetching business by slug:', error);
     return null;
   }
-  return data;
+
+  if (data) return data;
+
+  // Fallback de resiliencia: usar el primer negocio disponible para evitar mostrar demo innecesariamente.
+  const { data: firstBusiness, error: firstBusinessError } = await supabase
+    .from('businesses')
+    .select('*')
+    .limit(1)
+    .maybeSingle();
+
+  if (firstBusinessError) {
+    console.error('Error fetching fallback business:', firstBusinessError);
+    return null;
+  }
+
+  if (firstBusiness) {
+    console.warn(`No se encontró negocio con slug "${slug}". Usando fallback: ${firstBusiness.slug ?? firstBusiness.id}`);
+  }
+
+  return firstBusiness ?? null;
 }
 
 export async function getBusinessProducts(businessId: string) {
