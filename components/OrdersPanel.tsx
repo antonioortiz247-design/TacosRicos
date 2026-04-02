@@ -1,29 +1,36 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { OrderStatus } from '@/lib/types';
 import { updateOrderStatus } from '@/lib/actions';
 
 type OrderRow = {
   id: string;
   customer: string;
   total: number;
-  status: OrderStatus;
+  status: AdminOrderStatus;
   created_at: string;
   address?: string;
   delivery_type: string;
 };
 
-const statuses: OrderStatus[] = ['pending', 'confirmed', 'preparing', 'ready', 'on_the_way', 'delivered'];
+const statuses = ['pending', 'delivered', 'cancelled', 'paid', 'pending_payment'] as const;
+type AdminOrderStatus = (typeof statuses)[number];
 
-const statusLabels: Record<OrderStatus, string> = {
+const statusLabels: Record<AdminOrderStatus, string> = {
   pending: 'Pendiente',
-  confirmed: 'Confirmado',
-  preparing: 'Preparando',
-  ready: 'Listo',
-  on_the_way: 'En camino',
-  delivered: 'Entregado'
+  delivered: 'Entregado',
+  cancelled: 'Cancelado',
+  paid: 'Pagado',
+  pending_payment: 'Pendiente pago'
 };
+
+function normalizeOrderStatus(status: string): AdminOrderStatus {
+  if (status === 'delivered') return 'delivered';
+  if (status === 'cancelled' || status === 'canceled') return 'cancelled';
+  if (status === 'paid') return 'paid';
+  if (status === 'pending_payment' || status === 'payment_pending') return 'pending_payment';
+  return 'pending';
+}
 
 export function OrdersPanel({ initialOrders }: { initialOrders: any[] }) {
   const [orders, setOrders] = useState<OrderRow[]>(
@@ -31,18 +38,18 @@ export function OrdersPanel({ initialOrders }: { initialOrders: any[] }) {
       id: o.id,
       customer: o.address || 'Cliente',
       total: o.total,
-      status: o.status as OrderStatus,
+      status: normalizeOrderStatus(o.status),
       created_at: o.created_at,
       address: o.address,
       delivery_type: o.delivery_type
     }))
   );
-  const [filter, setFilter] = useState<'all' | OrderStatus>('all');
+  const [filter, setFilter] = useState<'all' | AdminOrderStatus>('all');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const filtered = useMemo(() => (filter === 'all' ? orders : orders.filter((order) => order.status === filter)), [filter, orders]);
 
-  const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
+  const handleStatusChange = async (orderId: string, newStatus: AdminOrderStatus) => {
     setUpdatingId(orderId);
     try {
       const result = await updateOrderStatus(orderId, newStatus);
@@ -68,7 +75,7 @@ export function OrdersPanel({ initialOrders }: { initialOrders: any[] }) {
         <select 
           className="rounded-lg border border-warm-200 bg-warm-50 p-2 text-sm focus:border-warm-500 focus:ring-warm-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200" 
           value={filter} 
-          onChange={(e) => setFilter(e.target.value as 'all' | OrderStatus)}
+          onChange={(e) => setFilter(e.target.value as 'all' | AdminOrderStatus)}
         >
           <option value="all">Todos los estados</option>
           {statuses.map((status) => (
@@ -112,13 +119,15 @@ export function OrdersPanel({ initialOrders }: { initialOrders: any[] }) {
                     <select
                       disabled={updatingId === order.id}
                       value={order.status}
-                      onChange={(e) => handleStatusChange(order.id, e.target.value as OrderStatus)}
+                      onChange={(e) => handleStatusChange(order.id, e.target.value as AdminOrderStatus)}
                       className={`w-full rounded-lg border p-2 text-xs font-medium transition-colors ${
                         updatingId === order.id ? 'opacity-50' : ''
                       } ${
                         order.status === 'pending' ? 'border-amber-200 bg-amber-50 text-amber-700' :
+                        order.status === 'pending_payment' ? 'border-orange-200 bg-orange-50 text-orange-700' :
                         order.status === 'delivered' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' :
-                        'border-blue-200 bg-blue-50 text-blue-700'
+                        order.status === 'paid' ? 'border-sky-200 bg-sky-50 text-sky-700' :
+                        'border-rose-200 bg-rose-50 text-rose-700'
                       }`}
                     >
                       {statuses.map((status) => (

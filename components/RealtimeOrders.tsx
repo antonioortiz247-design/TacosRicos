@@ -10,6 +10,14 @@ type Order = {
   created_at?: string;
 };
 
+function getStatusLabel(status: string) {
+  if (status === 'delivered') return 'Entregado';
+  if (status === 'cancelled' || status === 'canceled') return 'Cancelado';
+  if (status === 'paid') return 'Pagado';
+  if (status === 'pending_payment' || status === 'payment_pending') return 'Pendiente pago';
+  return 'Pendiente';
+}
+
 export function RealtimeOrders({ initialOrders, businessId }: { initialOrders: Order[], businessId: string }) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
 
@@ -65,10 +73,12 @@ export function RealtimeOrders({ initialOrders, businessId }: { initialOrders: O
               <div className="flex items-center gap-2">
                 <span className={`pill ${
                   row.status === 'pending' ? 'bg-amber-100 text-amber-700' : 
+                  row.status === 'pending_payment' ? 'bg-orange-100 text-orange-700' :
                   row.status === 'delivered' ? 'bg-green-100 text-green-700' : 
-                  'bg-blue-100 text-blue-700'
+                  row.status === 'paid' ? 'bg-sky-100 text-sky-700' :
+                  'bg-rose-100 text-rose-700'
                 }`}>
-                  {row.status}
+                  {getStatusLabel(row.status)}
                 </span>
               </div>
             </li>
