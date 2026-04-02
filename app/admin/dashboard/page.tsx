@@ -21,7 +21,7 @@ export default async function DashboardPage() {
 
     return (
       <main className="min-h-screen">
-        <Header title={`Admin · ${metrics.businessName}`} subtitle="Ventas y rendimiento del día" />
+        <Header title="Admin · Tacos Ricos" subtitle="Ventas y rendimiento del día" />
         <div className="mx-auto w-full max-w-6xl space-y-4 px-3 pb-8 pt-4 sm:px-4 sm:pb-10 sm:pt-5 md:space-y-5">
           {metrics.products.length === 0 && (
             <section className="surface-card border-amber-200/70 bg-amber-50/80 p-4 sm:p-5 dark:border-amber-900/50 dark:bg-amber-900/20">
