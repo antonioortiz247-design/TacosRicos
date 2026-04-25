@@ -16,7 +16,7 @@ export default function HomePage() {
           <div className="text-center lg:text-left">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-orange-100 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-orange-700">
               <Star size={14} className="fill-orange-700" />
-              Los mejores de la zona
+              Padrinos en la casa
             </div>
             
             <h1 className="text-5xl font-black tracking-tighter text-zinc-900 md:text-7xl lg:text-8xl">
