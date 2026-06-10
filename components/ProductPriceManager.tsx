@@ -174,12 +174,12 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
               </span>
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {products.length === 0 && (
               <button 
                 onClick={handleSeed}
                 disabled={isSeeding}
-                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 disabled:opacity-50"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 disabled:opacity-50 sm:w-auto"
               >
                 {isSeeding ? <Loader2 className="animate-spin" size={16} /> : <PlusCircle size={16} />}
                 Importar Menú Base
@@ -187,7 +187,7 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
             )}
             <button 
               onClick={() => setIsAdding(!isAdding)}
-              className="inline-flex items-center gap-2 rounded-xl bg-yellow-400 px-4 py-2 text-xs font-bold text-zinc-900 hover:bg-yellow-500"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-yellow-400 px-4 py-2 text-xs font-bold text-zinc-900 hover:bg-yellow-500 sm:w-auto"
             >
               {isAdding ? <X size={16} /> : <PlusCircle size={16} />}
               {isAdding ? 'Cerrar' : 'Añadir Producto'}
@@ -291,7 +291,79 @@ export function ProductPriceManager({ products: initialProducts, businessId }: {
       </div>
 
       <div className="max-h-[600px] overflow-y-auto">
-        <table className="w-full text-left text-sm border-separate border-spacing-0">
+        <div className="space-y-3 p-4 sm:hidden">
+          {filteredProducts.map((product) => (
+            <article key={product.id} className="rounded-2xl border border-warm-100 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-start gap-3">
+                  {product.imageUrl ? (
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="h-12 w-12 shrink-0 rounded-xl border border-warm-100 object-cover dark:border-zinc-800"
+                    />
+                  ) : (
+                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-warm-100 bg-warm-50/40 text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:border-zinc-800 dark:bg-zinc-800/30">
+                      Sin
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="truncate text-base font-black text-zinc-900 dark:text-zinc-100">{product.name}</p>
+                    <p className="mt-0.5 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                      <Tag size={10} />
+                      {categoryLabels[product.category] || product.category}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center gap-2">
+                <div className="flex flex-1 items-center rounded-xl border-2 border-warm-100 bg-white focus-within:border-warm-500 focus-within:ring-2 focus-within:ring-warm-500/20 dark:border-zinc-700 dark:bg-zinc-800 transition-all shadow-sm">
+                  <span className="pl-3 text-zinc-400 font-medium">$</span>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    value={product.price}
+                    onChange={(e) => handlePriceChange(product.id, e.target.value)}
+                    className="w-full bg-transparent py-2 pr-3 text-right text-sm font-black text-zinc-900 focus:outline-none dark:text-zinc-100"
+                    aria-label={`Precio de ${product.name}`}
+                  />
+                </div>
+                <button
+                  onClick={() => handleSave(product.id, product.price)}
+                  disabled={updatingId === product.id}
+                  className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 ${
+                    successId === product.id
+                      ? 'bg-emerald-500 text-white shadow-emerald-200'
+                      : updatingId === product.id
+                      ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
+                      : 'bg-warm-600 text-white hover:bg-warm-700 hover:shadow-md'
+                  }`}
+                >
+                  {successId === product.id ? (
+                    <CheckCircle2 size={16} />
+                  ) : updatingId === product.id ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <Save size={16} />
+                  )}
+                  <span>{successId === product.id ? 'OK' : updatingId === product.id ? '...' : 'Guardar'}</span>
+                </button>
+                <button
+                  onClick={() => void handleDelete(product.id)}
+                  className="inline-flex items-center justify-center rounded-xl border border-red-200 p-2 text-red-600 hover:bg-red-50"
+                  title="Eliminar producto"
+                  aria-label={`Eliminar ${product.name}`}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <table className="hidden w-full text-left text-sm border-separate border-spacing-0 sm:table">
           <thead className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm text-zinc-500 dark:bg-zinc-900/95">
             <tr>
               <th className="border-b border-warm-50 px-6 py-4 font-semibold dark:border-zinc-800">Producto</th>

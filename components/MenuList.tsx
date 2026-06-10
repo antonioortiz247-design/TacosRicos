@@ -45,6 +45,7 @@ export function MenuList({ products }: { products: Product[] }) {
                       productId: item.id,
                       productName: item.name,
                       quantity: 1,
+                      imageUrl: item.imageUrl,
                       unitPrice: item.price,
                       subtotal: item.price
                     })
@@ -66,6 +67,7 @@ export function MenuList({ products }: { products: Product[] }) {
               productId: selected.id,
               productName: selected.name,
               quantity: 1,
+              imageUrl: selected.imageUrl,
               config,
               unitPrice,
               subtotal: unitPrice

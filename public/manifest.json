@@ -1,7 +1,7 @@
 {
-  "name": "Tacos Ricos PWA",
-  "short_name": "TacosRicos",
-  "description": "Pedidos de tacos, delivery y eventos",
+  "name": "Tu Restaurante",
+  "short_name": "TuRestaurante",
+  "description": "Pedidos en línea, delivery y eventos",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fff8ef",

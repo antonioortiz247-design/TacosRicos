@@ -2,8 +2,11 @@ import { Header } from '@/components/Header';
 import { OrdersPanel } from '@/components/OrdersPanel';
 import { getBusinessOrders } from '@/lib/admin-queries';
 import { getRequestedOrConfiguredBusinessIdentifier } from '@/lib/business-config';
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export default async function OrdersPage({ searchParams }: { searchParams?: { negocio?: string } }) {
   const businessIdentifier = getRequestedOrConfiguredBusinessIdentifier(searchParams?.negocio);
@@ -18,12 +21,30 @@ export default async function OrdersPage({ searchParams }: { searchParams?: { ne
 
   try {
     const orders = await getBusinessOrders(businessIdentifier);
+    const firstBusinessId = (orders as any[])?.[0]?.business_id as string | undefined;
+
+    let businessId = firstBusinessId || '';
+    if (!businessId && UUID_REGEX.test(businessIdentifier)) {
+      businessId = businessIdentifier;
+    }
+
+    if (!businessId && businessIdentifier) {
+      const adminClient = getSupabaseAdmin();
+      if (adminClient) {
+        const { data: bySlug } = await adminClient.from('businesses').select('id').eq('slug', businessIdentifier).maybeSingle();
+        businessId = bySlug?.id || '';
+        if (!businessId) {
+          const { data: firstBiz } = await adminClient.from('businesses').select('id').limit(1).maybeSingle();
+          businessId = firstBiz?.id || '';
+        }
+      }
+    }
 
     return (
       <main className="mx-auto min-h-screen max-w-6xl p-4">
         <Header title="Admin · Pedidos" subtitle="Cambiar estado, filtrar y ver detalle" variant="admin" backHref="/admin/dashboard" navLinks={adminNavLinks} />
         <div className="mt-4">
-          <OrdersPanel initialOrders={orders as any} />
+          <OrdersPanel initialOrders={orders as any} businessId={businessId} />
         </div>
       </main>
     );

@@ -34,6 +34,32 @@ function getItemConfig(item: any) {
   return `${item.config.tortilla ?? 'maíz'} · ${extras}${notes}`;
 }
 
+const PRODUCT_IMAGE_FILE_NAMES: Partial<Record<string, string>> = {
+  Barriga: 'TacodeBarriga.jpg',
+  Suadero: 'TacodeSuadero.png',
+  Pechuga: 'TacodePechuga.jpg',
+  Longaniza: 'TacodeLonganiza.jpg',
+  'Chile Relleno': 'TacodeChile.jpg',
+  Campechanos: 'TacoCampechano.jpg',
+  'Chorizo Argentino': 'TacoArgentino.jpg',
+  Chuleta: 'TacodeChuleta.jpg',
+  Burrito: 'TacodePechuga.png',
+  Gringas: 'TacodeSuadero.png'
+};
+
+function getProductImageUrl(productName?: string): string | undefined {
+  if (!productName) return undefined;
+  const fileName = PRODUCT_IMAGE_FILE_NAMES[productName]?.trim();
+  if (!fileName) return undefined;
+  return fileName.startsWith('/') ? fileName : `/${fileName}`;
+}
+
+function getItemImageUrl(item: any): string | undefined {
+  const candidate = item?.imageUrl ?? item?.image_url ?? item?.image ?? undefined;
+  if (typeof candidate === 'string' && candidate.trim()) return candidate;
+  return getProductImageUrl(item?.productName ?? item?.product_name);
+}
+
 function sortOrders(orders: KitchenOrder[]) {
   return [...orders].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 }
@@ -138,11 +164,24 @@ export function KitchenOrdersPanel({ initialOrders, businessId }: { initialOrder
         {order.items.map((item: any, index: number) => (
           <li key={`${order.id}-${item.id ?? index}`} className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-900/70">
             <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="font-black text-zinc-900 dark:text-zinc-100">
-                  {item.quantity ?? 1}× {item.productName ?? item.product_name ?? 'Producto'}
-                </p>
-                <p className="mt-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">{getItemConfig(item)}</p>
+              <div className="flex min-w-0 items-start gap-3">
+                {getItemImageUrl(item) ? (
+                  <img
+                    src={getItemImageUrl(item)}
+                    alt={item.productName ?? item.product_name ?? 'Producto'}
+                    className="h-10 w-10 shrink-0 rounded-xl border border-zinc-100 object-cover dark:border-zinc-800"
+                  />
+                ) : (
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-zinc-100 bg-zinc-50 text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/70">
+                    Sin
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="truncate font-black text-zinc-900 dark:text-zinc-100">
+                    {item.quantity ?? 1}× {item.productName ?? item.product_name ?? 'Producto'}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">{getItemConfig(item)}</p>
+                </div>
               </div>
               <span className="text-sm font-bold text-zinc-600 dark:text-zinc-300">${item.subtotal ?? item.unitPrice ?? 0}</span>
             </div>

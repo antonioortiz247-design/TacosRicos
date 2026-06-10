@@ -49,7 +49,7 @@ export const useCartStore = create<CartState>()(
       getTotal: () => get().getSubtotal() + get().getDeliveryFee()
     }),
     {
-      name: 'tacos-ricos-cart'
+      name: 'tu-restaurante-cart'
     }
   )
 );

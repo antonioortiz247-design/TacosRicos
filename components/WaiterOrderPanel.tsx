@@ -16,6 +16,35 @@ const sectionTitles: Record<Product['category'], string> = {
 
 const proteinOptions = ['Barriga', 'Suadero', 'Pechuga', 'Longaniza', 'Chile relleno', 'Campechano', 'Chorizo argentino', 'Chuleta'];
 
+const PRODUCT_IMAGE_FILE_NAMES: Partial<Record<string, string>> = {
+  Barriga: 'TacodeBarriga.jpg',
+  Suadero: 'TacodeSuadero.png',
+  Pechuga: 'TacodePechuga.jpg',
+  Longaniza: 'TacodeLonganiza.jpg',
+  'Chile Relleno': 'TacodeChile.jpg',
+  Campechanos: 'TacoCampechano.jpg',
+  'Chorizo Argentino': 'TacoArgentino.jpg',
+  Chuleta: 'TacodeChuleta.jpg',
+  Burrito: 'TacodePechuga.png',
+  Gringas: 'TacodeSuadero.png'
+};
+
+function getProductImageUrl(product?: Product | null): string | undefined {
+  if (!product) return undefined;
+  if (product.imageUrl?.trim()) return product.imageUrl;
+  const fileName = PRODUCT_IMAGE_FILE_NAMES[product.name]?.trim();
+  if (!fileName) return undefined;
+  return fileName.startsWith('/') ? fileName : `/${fileName}`;
+}
+
+function getItemImageUrl(item: CartItem): string | undefined {
+  const candidate = (item as any)?.imageUrl;
+  if (typeof candidate === 'string' && candidate.trim()) return candidate;
+  const fileName = PRODUCT_IMAGE_FILE_NAMES[item.productName]?.trim();
+  if (!fileName) return undefined;
+  return fileName.startsWith('/') ? fileName : `/${fileName}`;
+}
+
 function formatItemConfig(config?: TacoConfig) {
   if (!config) return 'Sin observaciones';
   const notes = config.notes?.trim();
@@ -24,7 +53,7 @@ function formatItemConfig(config?: TacoConfig) {
 }
 
 function getWaiterStorageKey(businessId: string) {
-  return `tacos-ricos-waiter:${businessId}`;
+  return `tu-restaurante-waiter:${businessId}`;
 }
 
 export function WaiterOrderPanel({
@@ -99,6 +128,7 @@ export function WaiterOrderPanel({
     };
 
     const subtotal = unitPrice * quantity;
+    const imageUrl = getProductImageUrl(selectedProduct);
     setItems((current) => [
       ...current,
       {
@@ -108,7 +138,8 @@ export function WaiterOrderPanel({
         quantity,
         config,
         unitPrice,
-        subtotal
+        subtotal,
+        imageUrl
       }
     ]);
     resetItemForm();
@@ -164,9 +195,22 @@ export function WaiterOrderPanel({
                     onClick={() => setSelectedProduct(product)}
                     className="surface-card flex items-center justify-between gap-3 p-4 text-left transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-lg"
                   >
-                    <div>
-                      <p className="text-lg font-black tracking-tight text-zinc-900 dark:text-zinc-100">{product.name}</p>
-                      {product.description ? <p className="mt-1 line-clamp-2 text-sm text-zinc-500 dark:text-zinc-400">{product.description}</p> : null}
+                    <div className="flex min-w-0 items-center gap-3">
+                      {getProductImageUrl(product) ? (
+                        <img
+                          src={getProductImageUrl(product)}
+                          alt={product.name}
+                          className="h-12 w-12 shrink-0 rounded-xl border border-zinc-100 object-cover dark:border-zinc-800"
+                        />
+                      ) : (
+                        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-zinc-100 bg-zinc-50 text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/70">
+                          Sin
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="truncate text-lg font-black tracking-tight text-zinc-900 dark:text-zinc-100">{product.name}</p>
+                        {product.description ? <p className="mt-1 line-clamp-2 text-sm text-zinc-500 dark:text-zinc-400">{product.description}</p> : null}
+                      </div>
                     </div>
                     <span className="shrink-0 text-xl font-black text-orange-600 dark:text-orange-400">${product.price}</span>
                   </button>
@@ -209,11 +253,24 @@ export function WaiterOrderPanel({
               {items.map((item) => (
                 <li key={item.id} className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-900/70">
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-black text-zinc-900 dark:text-zinc-100">
-                        {item.quantity}× {item.productName}
-                      </p>
-                      <p className="mt-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">{formatItemConfig(item.config)}</p>
+                    <div className="flex min-w-0 items-start gap-3">
+                      {getItemImageUrl(item) ? (
+                        <img
+                          src={getItemImageUrl(item)}
+                          alt={item.productName}
+                          className="h-10 w-10 shrink-0 rounded-xl border border-zinc-100 object-cover dark:border-zinc-800"
+                        />
+                      ) : (
+                        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-zinc-100 bg-zinc-50 text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/70">
+                          Sin
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="truncate font-black text-zinc-900 dark:text-zinc-100">
+                          {item.quantity}× {item.productName}
+                        </p>
+                        <p className="mt-1 line-clamp-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">{formatItemConfig(item.config)}</p>
+                      </div>
                     </div>
                     <div className="text-right">
                       <p className="font-black text-orange-600 dark:text-orange-400">${item.subtotal}</p>

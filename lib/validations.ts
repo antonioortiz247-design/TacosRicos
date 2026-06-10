@@ -12,6 +12,7 @@ export const CartItemSchema = z.object({
   productId: z.string(),
   productName: z.string(),
   quantity: z.number().min(1),
+  imageUrl: z.string().optional(),
   config: TacoConfigSchema.optional(),
   unitPrice: z.number(),
   subtotal: z.number(),

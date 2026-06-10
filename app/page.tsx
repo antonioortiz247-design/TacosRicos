@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { ArrowRight, Star, Clock, MapPin } from 'lucide-react';
 
 export default function HomePage() {
-  const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_SLUG || 'tacos-ricos';
+  const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_SLUG || 'tu-restaurante';
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-12 lg:py-24">
@@ -20,15 +20,15 @@ export default function HomePage() {
             </div>
             
             <h1 className="text-5xl font-black tracking-tighter text-zinc-900 md:text-7xl lg:text-8xl">
-              Tacos <br />
+              Tu <br />
               <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                Rico´s
+                Restaurante
               </span>
             </h1>
             
             <p className="mt-6 text-lg font-medium leading-relaxed text-zinc-600 md:text-xl">
-              Pide rápido, personaliza cada taco y disfruta del auténtico sabor directo en tu puerta. 
-              <span className="hidden md:inline"> La tradición que te mereces, a un clic de distancia.</span>
+              Pide rápido, personaliza tu orden y recibe delivery o recoge en tienda en segundos.
+              <span className="hidden md:inline"> Una experiencia moderna lista para tu marca.</span>
             </p>
 
             <div className="mt-10 flex flex-col gap-4 sm:flex-row lg:justify-start">
@@ -62,7 +62,7 @@ export default function HomePage() {
             <div className="animate-float relative z-10 aspect-square overflow-hidden rounded-[3rem] border-8 border-white shadow-soft-xl">
               <Image 
                 src="/logotacosricos.png" 
-                alt="Logo Tacos Rico´s" 
+                alt="Logo Tu Restaurante" 
                 fill 
                 className="object-cover"
                 priority
@@ -76,7 +76,7 @@ export default function HomePage() {
       </section>
 
       <footer className="mt-24 text-center text-xs font-bold uppercase tracking-[0.2em] text-zinc-400">
-        © 2026 Tacos Rico´s · El auténtico sabor mexicano
+        © 2026 Tu Restaurante · Pedidos en línea
       </footer>
     </main>
   );

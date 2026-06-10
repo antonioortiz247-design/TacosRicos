@@ -13,7 +13,7 @@ export default async function DashboardPage() {
   const businessIdentifier =
     process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_ID ||
     process.env.NEXT_PUBLIC_DEFAULT_BUSINESS_SLUG ||
-    'tacos-ricos';
+    'tu-restaurante';
 
   try {
     const metrics = await getOwnerDashboardMetrics(businessIdentifier);
@@ -28,7 +28,7 @@ export default async function DashboardPage() {
 
     return (
       <main className="min-h-screen">
-        <Header title="Admin · Tacos Ricos" subtitle="Ventas y rendimiento del día" variant="admin" navLinks={adminNavLinks} />
+        <Header title="Admin · Tu Restaurante" subtitle="Ventas y rendimiento del día" variant="admin" navLinks={adminNavLinks} />
         <div className="mx-auto w-full max-w-6xl space-y-4 px-3 pb-8 pt-4 sm:px-4 sm:pb-10 sm:pt-5 md:space-y-5">
           <nav className="grid gap-2 sm:grid-cols-5" aria-label="Accesos rápidos">
             <Link href="/admin/waiter" className="primary-btn justify-center">

@@ -6,13 +6,13 @@ import { FloatingCart } from '@/components/FloatingCart';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Tacos Rico´s - Pide rápido y sabroso',
-  description: 'La mejor taquería con pedidos en línea, personalización y delivery directo a tu puerta.',
+  title: 'Tu Restaurante - Pedidos en línea',
+  description: 'Una plataforma moderna para pedidos en línea, personalización y delivery.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Tacos Rico´s',
+    title: 'Tu Restaurante',
   },
   formatDetection: {
     telephone: false,

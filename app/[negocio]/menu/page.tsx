@@ -81,8 +81,8 @@ export default async function BusinessMenuPage({ params }: { params: { negocio: 
   const settings = business ? await getBusinessSettings(business.id) : null;
   const waPhone = settings?.whatsapp_number || process.env.NEXT_PUBLIC_WA_PHONE || "5586495622";
 
-  const businessDisplayName = business?.name || (params.negocio === 'tacos-ricos' ? 'Tacos Rico´s' : params.negocio);
-  const headerTitle = 'Tacos Ricos';
+  const businessDisplayName = business?.name || (params.negocio === 'tu-restaurante' ? 'Tu Restaurante' : params.negocio);
+  const headerTitle = 'Tu Restaurante';
   const businessId = business?.id || params.negocio;
 
   // Obtener productos desde la DB

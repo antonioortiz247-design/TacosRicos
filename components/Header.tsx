@@ -68,7 +68,7 @@ export function Header({ title, subtitle, isOpen, eventHref, variant = 'customer
             {!logoError ? (
               <img
                 src="/logotacosricos.png"
-                alt="Logo Tacos Ricos"
+                alt="Logo Tu Restaurante"
                 className="h-12 w-12 rounded-2xl border border-slate-200 object-cover shadow-sm dark:border-slate-700"
                 onError={() => setLogoError(true)}
               />

@@ -30,6 +30,7 @@ export type CartItem = {
   productId: string;
   productName: string;
   quantity: number;
+  imageUrl?: string;
   config?: TacoConfig;
   unitPrice: number;
   subtotal: number;

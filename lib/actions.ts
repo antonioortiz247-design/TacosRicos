@@ -366,3 +366,33 @@ export async function updateOrderStatus(orderId: string, status: string) {
     };
   }
 }
+
+export async function deleteBusinessOrders(businessIdOrSlug: string) {
+  try {
+    const { getSupabaseAdmin } = await import('./supabase');
+    const adminClient = getSupabaseAdmin();
+    if (!adminClient) throw new Error('Falta SUPABASE_SERVICE_ROLE_KEY en el servidor.');
+
+    const businessId = await resolveBusinessIdForWrite(adminClient, businessIdOrSlug);
+
+    const { data: orders, error: ordersError } = await adminClient.from('orders').select('id').eq('business_id', businessId);
+    if (ordersError) throw ordersError;
+
+    const orderIds = (orders ?? []).map((row: any) => row.id).filter(Boolean);
+
+    if (orderIds.length > 0) {
+      const { error: deliveriesError } = await adminClient.from('deliveries').delete().in('order_id', orderIds);
+      if (deliveriesError && !String(deliveriesError.message || '').includes('does not exist')) {
+        throw deliveriesError;
+      }
+    }
+
+    const { error: deleteOrdersError } = await adminClient.from('orders').delete().eq('business_id', businessId);
+    if (deleteOrdersError) throw deleteOrdersError;
+
+    return { success: true, deleted: orderIds.length };
+  } catch (error: any) {
+    const errorMessage = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
+    return { success: false, error: errorMessage };
+  }
+}
