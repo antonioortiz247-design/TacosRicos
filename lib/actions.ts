@@ -344,9 +344,11 @@ export async function deleteProduct(productId: string) {
 export async function updateOrderStatus(orderId: string, status: string) {
   try {
     const { getSupabaseAdmin, getSupabaseClient } = await import('./supabase');
-    const supabase = getSupabaseAdmin() || getSupabaseClient();
+    const adminClient = getSupabaseAdmin();
+    const supabase = adminClient || getSupabaseClient();
     
-    if (!supabase) throw new Error('No se pudo conectar con la base de datos');
+    if (!supabase) throw new Error('No se pudo conectar con la base de datos (Supabase)');
+    if (!adminClient) throw new Error('Falta SUPABASE_SERVICE_ROLE_KEY en el servidor.');
 
     const { error } = await supabase
       .from('orders')
@@ -355,11 +357,12 @@ export async function updateOrderStatus(orderId: string, status: string) {
 
     if (error) throw error;
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating order status:', error);
+    const errorMessage = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
     return { 
       success: false, 
-      error: error instanceof Error ? error.message : 'No se pudo actualizar el estado' 
+      error: errorMessage
     };
   }
 }

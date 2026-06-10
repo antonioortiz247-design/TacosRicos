@@ -1,5 +1,5 @@
 import type { Product } from './types';
-import { getSupabaseClient } from './supabase';
+import { getSupabaseAdmin, getSupabaseClient } from './supabase';
 
 export const SALES_QUERY_SQL = 'SELECT SUM(total) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
 export const ORDERS_QUERY_SQL = 'SELECT COUNT(*) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
@@ -20,8 +20,11 @@ function mapProductRow(row: any) {
   };
 }
 
-export async function resolveBusinessId(businessIdOrSlug?: string | null): Promise<string | null> {
-  const supabase = getSupabaseClient();
+export async function resolveBusinessId(
+  businessIdOrSlug?: string | null,
+  supabaseOverride?: ReturnType<typeof getSupabaseClient>
+): Promise<string | null> {
+  const supabase = supabaseOverride ?? getSupabaseClient();
   if (!supabase || !businessIdOrSlug) return null;
 
   if (UUID_REGEX.test(businessIdOrSlug)) {
@@ -99,6 +102,26 @@ export async function getBusinessProducts(businessId: string) {
   return (data ?? []).map(mapProductRow);
 }
 
+async function getBusinessProductsAdmin(businessId: string) {
+  const adminClient = getSupabaseAdmin();
+  const supabase = adminClient || getSupabaseClient();
+  if (!supabase || !adminClient) return [];
+
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('business_id', businessId)
+    .eq('active', true)
+    .order('name');
+
+  if (error) {
+    console.error('Error fetching products (admin):', error);
+    return [];
+  }
+
+  return (data ?? []).map(mapProductRow);
+}
+
 export async function getBusinessSettings(businessId: string) {
   const supabase = getSupabaseClient();
   if (!supabase) return null;
@@ -113,9 +136,12 @@ export async function getBusinessSettings(businessId: string) {
 }
 
 export async function getBusinessOrders(businessId: string) {
-  const supabase = getSupabaseClient();
-  if (!supabase) return [];
-  const resolvedBusinessId = await resolveBusinessId(businessId);
+  const adminClient = getSupabaseAdmin();
+  const supabase = adminClient || getSupabaseClient();
+  if (!supabase) throw new Error('No se pudo conectar con Supabase.');
+  if (!adminClient) throw new Error('Falta SUPABASE_SERVICE_ROLE_KEY. No se pueden listar pedidos en el panel.');
+
+  const resolvedBusinessId = await resolveBusinessId(businessId, supabase);
   if (!resolvedBusinessId) return [];
 
   const { data, error } = await supabase
@@ -124,12 +150,16 @@ export async function getBusinessOrders(businessId: string) {
     .eq('business_id', resolvedBusinessId)
     .order('created_at', { ascending: false });
   
-  if (error) return [];
+  if (error) {
+    console.error('Error fetching business orders:', error);
+    throw new Error(error.message);
+  }
   return data;
 }
 
 export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
-  const supabase = getSupabaseClient();
+  const adminClient = getSupabaseAdmin();
+  const supabase = adminClient || getSupabaseClient();
   if (!supabase) {
     return {
       sales: 0,
@@ -250,10 +280,16 @@ export type KitchenOrder = {
 };
 
 export async function getKitchenOrders(businessIdOrSlug: string): Promise<{ businessId: string; orders: KitchenOrder[] }> {
-  const supabase = getSupabaseClient();
+  const adminClient = getSupabaseAdmin();
+  const supabase = adminClient || getSupabaseClient();
   if (!supabase) return { businessId: businessIdOrSlug, orders: [] };
 
-  const resolvedBusinessId = await resolveBusinessId(businessIdOrSlug);
+  if (!adminClient) {
+    console.error('Falta SUPABASE_SERVICE_ROLE_KEY. No se pueden listar pedidos de cocina.');
+    return { businessId: businessIdOrSlug, orders: [] };
+  }
+
+  const resolvedBusinessId = await resolveBusinessId(businessIdOrSlug, supabase);
   if (!resolvedBusinessId) return { businessId: businessIdOrSlug, orders: [] };
 
   const { data, error } = await supabase
@@ -280,19 +316,25 @@ export async function getKitchenOrders(businessIdOrSlug: string): Promise<{ busi
 }
 
 export async function getOrderEntryData(businessIdOrSlug: string): Promise<{ businessId: string; businessName: string; products: Product[] }> {
-  const supabase = getSupabaseClient();
+  const adminClient = getSupabaseAdmin();
+  const supabase = adminClient || getSupabaseClient();
   if (!supabase) {
     return { businessId: businessIdOrSlug, businessName: 'Negocio', products: [] };
   }
 
-  const resolvedBusinessId = await resolveBusinessId(businessIdOrSlug);
+  if (!adminClient) {
+    console.error('Falta SUPABASE_SERVICE_ROLE_KEY. No se pueden cargar datos del panel mesero.');
+    return { businessId: businessIdOrSlug, businessName: 'Negocio', products: [] };
+  }
+
+  const resolvedBusinessId = await resolveBusinessId(businessIdOrSlug, supabase);
   const businessId = resolvedBusinessId ?? businessIdOrSlug;
 
   const [{ data: business }, products] = await Promise.all([
     resolvedBusinessId
       ? supabase.from('businesses').select('name').eq('id', resolvedBusinessId).maybeSingle()
       : Promise.resolve({ data: null }),
-    resolvedBusinessId ? getBusinessProducts(resolvedBusinessId) : Promise.resolve([])
+    resolvedBusinessId ? getBusinessProductsAdmin(resolvedBusinessId) : Promise.resolve([])
   ]);
 
   return {
