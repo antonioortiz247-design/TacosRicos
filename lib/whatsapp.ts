@@ -1,4 +1,10 @@
-import { CartItem } from './types';
+import { CartItem, DeliveryType } from './types';
+
+function getDeliveryLabel(deliveryType: DeliveryType) {
+  if (deliveryType === 'dine_in') return 'Consumo en local';
+  if (deliveryType === 'pickup') return 'Recoger en local';
+  return 'Envío a domicilio';
+}
 
 export function buildWhatsAppOrderMessage(params: {
   businessName: string;
@@ -6,7 +12,7 @@ export function buildWhatsAppOrderMessage(params: {
   subtotal: number;
   deliveryFee: number;
   total: number;
-  deliveryType: 'pickup' | 'delivery';
+  deliveryType: DeliveryType;
   address?: string;
   address_references?: string;
   paymentMethod: string;
@@ -22,8 +28,8 @@ export function buildWhatsAppOrderMessage(params: {
       return `${idx + 1}. ${item.productName} x${item.quantity} - $${item.subtotal} (${config})`;
     }),
     '',
-    `Entrega: ${params.deliveryType === 'pickup' ? 'Recoger en local' : 'Envío a domicilio'}`,
-    params.address ? `Dirección: ${params.address}` : '',
+    `Entrega: ${getDeliveryLabel(params.deliveryType)}`,
+    params.address ? `${params.deliveryType === 'dine_in' ? 'Mesa/referencia' : 'Dirección'}: ${params.address}` : '',
     params.address_references ? `Referencias: ${params.address_references}` : '',
     `Pago: ${params.paymentMethod}`,
     params.paymentStatus ? `Estado de pago: ${params.paymentStatus}` : '',

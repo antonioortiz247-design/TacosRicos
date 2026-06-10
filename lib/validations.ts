@@ -21,7 +21,7 @@ export const OrderSchema = z.object({
   businessId: z.string(),
   items: z.array(CartItemSchema),
   total: z.number(),
-  deliveryType: z.enum(['pickup', 'delivery']),
+  deliveryType: z.enum(['pickup', 'delivery', 'dine_in']),
   address: z.string().optional(),
   address_references: z.string().optional(),
   paymentMethod: z.enum(['cash', 'transfer']),
