@@ -72,10 +72,18 @@ export default async function WaiterPage({ searchParams }: { searchParams?: { ne
   const businessIdentifier = getRequestedOrConfiguredBusinessIdentifier(searchParams?.negocio);
   const { businessId, businessName, products } = await getOrderEntryData(businessIdentifier);
   const menuProducts = products.length > 0 ? products : getFallbackProducts(businessId);
+  const adminNavLinks = [
+    { href: '/admin/dashboard', label: 'Dashboard' },
+    { href: '/admin/orders', label: 'Pedidos' },
+    { href: '/admin/waiter', label: 'Mesero' },
+    { href: '/admin/kitchen', label: 'Cocina' },
+    { href: '/admin/menu', label: 'Menú' },
+    { href: '/admin/settings', label: 'Ajustes' }
+  ];
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl p-4">
-      <Header title="Admin · Mesero" subtitle={`Comandas en local · ${businessName}`} />
+      <Header title="Admin · Mesero" subtitle={`Comandas en local · ${businessName}`} variant="admin" backHref="/admin/dashboard" navLinks={adminNavLinks} />
       <div className="mt-4">
         <WaiterOrderPanel products={menuProducts} businessId={businessId} businessName={businessName} waiters={getConfiguredWaiters()} />
       </div>

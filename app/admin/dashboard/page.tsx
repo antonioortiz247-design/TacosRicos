@@ -16,18 +16,36 @@ export default async function DashboardPage() {
     'tacos-ricos';
 
   try {
-    // Obtener métricas y productos reales del negocio
     const metrics = await getOwnerDashboardMetrics(businessIdentifier);
+    const adminNavLinks = [
+      { href: '/admin/dashboard', label: 'Dashboard' },
+      { href: '/admin/orders', label: 'Pedidos' },
+      { href: '/admin/waiter', label: 'Mesero' },
+      { href: '/admin/kitchen', label: 'Cocina' },
+      { href: '/admin/menu', label: 'Menú' },
+      { href: '/admin/settings', label: 'Ajustes' }
+    ];
 
     return (
       <main className="min-h-screen">
-        <Header title="Admin · Tacos Ricos" subtitle="Ventas y rendimiento del día" />
+        <Header title="Admin · Tacos Ricos" subtitle="Ventas y rendimiento del día" variant="admin" navLinks={adminNavLinks} />
         <div className="mx-auto w-full max-w-6xl space-y-4 px-3 pb-8 pt-4 sm:px-4 sm:pb-10 sm:pt-5 md:space-y-5">
-          <nav className="grid gap-2 sm:grid-cols-4" aria-label="Apartados administrativos">
-            <Link href="/admin/waiter" className="primary-btn justify-center">Mesero</Link>
-            <Link href="/admin/kitchen" className="secondary-btn justify-center">Cocina</Link>
-            <Link href="/admin/orders" className="secondary-btn justify-center">Pedidos</Link>
-            <Link href="/admin/menu" className="secondary-btn justify-center">Menú</Link>
+          <nav className="grid gap-2 sm:grid-cols-5" aria-label="Accesos rápidos">
+            <Link href="/admin/waiter" className="primary-btn justify-center">
+              Mesero
+            </Link>
+            <Link href="/admin/kitchen" className="secondary-btn justify-center">
+              Cocina
+            </Link>
+            <Link href="/admin/orders" className="secondary-btn justify-center">
+              Pedidos
+            </Link>
+            <Link href="/admin/menu" className="secondary-btn justify-center">
+              Menú
+            </Link>
+            <Link href="#precios" className="secondary-btn justify-center">
+              Precios
+            </Link>
           </nav>
 
           {metrics.products.length === 0 && (
@@ -49,13 +67,15 @@ export default async function DashboardPage() {
               <div className="surface-card p-3 sm:p-4">
                 <AdminLiveQueriesPanel />
               </div>
-              <div className="surface-card p-3 sm:p-4">
+              <div id="pedidos" className="surface-card scroll-mt-28 p-3 sm:p-4">
                 <RealtimeOrders initialOrders={metrics.recentOrders} businessId={businessIdentifier} />
               </div>
             </div>
 
             <div className="space-y-4">
-              <ProductPriceManager products={metrics.products as any} businessId={businessIdentifier} />
+              <div id="precios" className="scroll-mt-28">
+                <ProductPriceManager products={metrics.products as any} businessId={businessIdentifier} />
+              </div>
             </div>
           </section>
         </div>
@@ -65,7 +85,7 @@ export default async function DashboardPage() {
     console.error('Error loading dashboard:', error);
     return (
       <main className="min-h-screen">
-        <Header title="Admin · Dashboard" subtitle="Ventas y rendimiento del día" />
+        <Header title="Admin · Dashboard" subtitle="Ventas y rendimiento del día" variant="admin" navLinks={[{ href: '/admin/dashboard', label: 'Dashboard' }]} />
         <div className="mx-auto w-full max-w-3xl px-3 pb-8 pt-6 sm:px-4">
           <section className="surface-card border-red-200/80 bg-red-50/90 p-5 text-center sm:p-7 dark:border-red-900/60 dark:bg-red-900/20">
             <h2 className="text-lg font-extrabold tracking-tight text-red-700 sm:text-xl dark:text-red-200">

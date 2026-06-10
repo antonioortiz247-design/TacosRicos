@@ -2,12 +2,16 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 type HeaderProps = {
   title: string;
   subtitle?: string;
   isOpen?: boolean;
   eventHref?: string;
+  variant?: 'customer' | 'admin';
+  backHref?: string;
+  navLinks?: Array<{ href: string; label: string }>;
 };
 
 type BeforeInstallPromptEvent = Event & {
@@ -23,7 +27,8 @@ function isWithinOrderSchedule(date: Date): boolean {
   return minutes >= OPENING_MINUTE && minutes <= CLOSING_MINUTE;
 }
 
-export function Header({ title, subtitle, isOpen, eventHref }: HeaderProps) {
+export function Header({ title, subtitle, isOpen, eventHref, variant = 'customer', backHref, navLinks }: HeaderProps) {
+  const pathname = usePathname();
   // Forzado a true para pruebas fuera de horario
   const openNow = useMemo(() => (typeof isOpen === 'boolean' ? isOpen : true), [isOpen]);
   const [logoError, setLogoError] = useState(false);
@@ -54,6 +59,11 @@ export function Header({ title, subtitle, isOpen, eventHref }: HeaderProps) {
     <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 px-4 py-3 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-950/85">
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
+          {backHref ? (
+            <Link href={backHref} className="secondary-btn px-3 py-1.5 text-xs sm:text-sm">
+              Volver
+            </Link>
+          ) : null}
           <Link href="/" className="transition-transform active:scale-95 hover:scale-105">
             {!logoError ? (
               <img
@@ -75,19 +85,52 @@ export function Header({ title, subtitle, isOpen, eventHref }: HeaderProps) {
         </div>
 
         <div className="flex flex-wrap items-center justify-end gap-2">
-          <span className={`pill ${openNow ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300'}`}>
-            {openNow ? 'Abierto' : 'Cerrado'}
-          </span>
-          <button onClick={handleInstallClick} className="primary-btn px-3 py-1.5 text-xs sm:text-sm">
-            Descargar App
-          </button>
-          {eventHref ? (
+          {variant !== 'admin' ? (
+            <span
+              className={`pill ${
+                openNow
+                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
+                  : 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300'
+              }`}
+            >
+              {openNow ? 'Abierto' : 'Cerrado'}
+            </span>
+          ) : null}
+          {variant !== 'admin' ? (
+            <button onClick={handleInstallClick} className="primary-btn px-3 py-1.5 text-xs sm:text-sm">
+              Descargar App
+            </button>
+          ) : null}
+          {variant !== 'admin' && eventHref ? (
             <Link href={eventHref} className="secondary-btn px-3 py-1.5 text-xs sm:text-sm">
               Reservar evento
             </Link>
           ) : null}
         </div>
       </div>
+
+      {variant === 'admin' && navLinks && navLinks.length > 0 ? (
+        <nav className="mx-auto mt-3 w-full max-w-6xl overflow-x-auto pb-1" aria-label="Navegación admin">
+          <div className="flex w-max min-w-full gap-2">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`rounded-full px-4 py-2 text-xs font-extrabold tracking-wide transition ${
+                    isActive
+                      ? 'bg-warm-600 text-white'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      ) : null}
     </header>
   );
 }
