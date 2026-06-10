@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useCartStore } from '@/store/cart-store';
+import { MapPin, Store, Truck } from 'lucide-react';
 
 export function DeliverySelector() {
   const { deliveryType, setDelivery, address, setAddress, address_references, setReferences, zone } = useCartStore();
@@ -14,24 +15,30 @@ export function DeliverySelector() {
 
   return (
     <section className="surface-card space-y-3">
-      <h3 className="section-title">Entrega</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="section-title">Entrega</h3>
+        <span className="pill">elige opción</span>
+      </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <button
           onClick={() => setDelivery('dine_in')}
-          className={`secondary-btn w-full ${deliveryType === 'dine_in' ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
+          className={`secondary-btn w-full ${deliveryType === 'dine_in' ? 'border-brand-500/40 bg-white/80 dark:bg-white/10' : ''}`}
         >
+          <Store size={16} className="text-brand-600 dark:text-brand-500" />
           En local
         </button>
         <button
           onClick={() => setDelivery('pickup')}
-          className={`secondary-btn w-full ${deliveryType === 'pickup' || deliveryType === 'dine_in' ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
+          className={`secondary-btn w-full ${deliveryType === 'pickup' || deliveryType === 'dine_in' ? 'border-brand-500/40 bg-white/80 dark:bg-white/10' : ''}`}
         >
+          <MapPin size={16} className="text-brand-600 dark:text-brand-500" />
           Recoger
         </button>
         <button
           onClick={() => setDelivery('delivery', zone)}
-          className={`secondary-btn w-full ${deliveryType === 'delivery' ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
+          className={`secondary-btn w-full ${deliveryType === 'delivery' ? 'border-brand-500/40 bg-white/80 dark:bg-white/10' : ''}`}
         >
+          <Truck size={16} className="text-accent-600 dark:text-accent-500" />
           Domicilio
         </button>
       </div>

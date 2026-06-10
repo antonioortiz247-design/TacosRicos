@@ -173,15 +173,15 @@ export function OrdersPanel({ initialOrders, businessId }: { initialOrders: any[
   };
 
   return (
-    <section className="space-y-4 rounded-2xl border border-warm-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+    <section className="surface-card space-y-4 p-5 sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-bold text-zinc-800 dark:text-zinc-100">Gestión de Pedidos</h2>
-          <p className="text-sm text-zinc-500">Administra los pedidos entrantes y sus estados</p>
+          <h2 className="font-display text-lg font-bold text-ink-900 dark:text-ink-50">Pedidos</h2>
+          <p className="text-sm text-ink-600 dark:text-ink-300">Actualiza estados en tiempo real</p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
           <select 
-            className="rounded-lg border border-warm-200 bg-warm-50 p-2 text-sm focus:border-warm-500 focus:ring-warm-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200" 
+            className="input-field py-2 text-sm" 
             value={filter} 
             onChange={(e) => setFilter(e.target.value as 'all' | AdminOrderStatus)}
           >
@@ -194,7 +194,7 @@ export function OrdersPanel({ initialOrders, businessId }: { initialOrders: any[
           <button
             onClick={() => void handleDeleteAll()}
             disabled={isDeleting}
-            className="secondary-btn justify-center border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 disabled:opacity-50"
+            className="secondary-btn justify-center border-rose-200 bg-rose-50/80 text-rose-700 hover:bg-rose-50 disabled:opacity-50 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200 dark:hover:bg-rose-500/15"
           >
             {isDeleting ? 'Borrando...' : 'Borrar pedidos'}
           </button>
@@ -203,7 +203,7 @@ export function OrdersPanel({ initialOrders, businessId }: { initialOrders: any[
 
       <div className="space-y-3 sm:hidden">
         {filtered.length === 0 ? (
-          <div className="rounded-xl border border-warm-100 bg-warm-50/30 p-5 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-800/20">
+          <div className="rounded-2xl border border-white/60 bg-white/50 p-5 text-center text-sm text-ink-600 backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-ink-300">
             No hay pedidos que coincidan con el filtro
           </div>
         ) : (
@@ -218,20 +218,20 @@ export function OrdersPanel({ initialOrders, businessId }: { initialOrders: any[
               .slice(0, 4) as string[];
 
             return (
-              <article key={order.id} className="rounded-2xl border border-warm-100 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+              <article key={order.id} className="rounded-2xl border border-white/60 bg-white/60 p-4 shadow-soft backdrop-blur dark:border-white/10 dark:bg-white/5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs text-zinc-400">#{order.id.slice(0, 8)}</span>
-                      <span className="text-xs font-medium text-zinc-500">{time}</span>
+                      <span className="font-mono text-xs text-ink-500 dark:text-ink-300">#{order.id.slice(0, 8)}</span>
+                      <span className="text-xs font-medium text-ink-500 dark:text-ink-300">{time}</span>
                     </div>
-                    <p className="mt-2 truncate text-sm font-black text-zinc-900 dark:text-zinc-100">{addressLabel}</p>
-                    <p className="mt-0.5 text-xs font-bold uppercase tracking-wide text-zinc-500">{deliveryLabel}</p>
+                    <p className="mt-2 truncate font-display text-sm font-bold text-ink-900 dark:text-ink-50">{addressLabel}</p>
+                    <p className="mt-0.5 text-xs font-bold uppercase tracking-wide text-ink-500 dark:text-ink-300">{deliveryLabel}</p>
                     {order.address_references ? (
-                      <p className="mt-1 line-clamp-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">{order.address_references}</p>
+                      <p className="mt-1 line-clamp-2 text-xs font-medium text-ink-600 dark:text-ink-300">{order.address_references}</p>
                     ) : null}
                   </div>
-                  <p className="shrink-0 text-right text-lg font-black text-warm-700 dark:text-warm-400">${order.total}</p>
+                  <p className="shrink-0 text-right font-display text-lg font-bold text-brand-600 dark:text-brand-500">${order.total}</p>
                 </div>
 
                 {thumbnails.length > 0 ? (
@@ -241,11 +241,11 @@ export function OrdersPanel({ initialOrders, businessId }: { initialOrders: any[
                         key={`${order.id}-thumb-${idx}`}
                         src={src}
                         alt="Producto"
-                        className="h-10 w-10 shrink-0 rounded-xl border border-warm-100 object-cover dark:border-zinc-800"
+                        className="h-10 w-10 shrink-0 rounded-2xl border border-white/60 object-cover dark:border-white/10"
                       />
                     ))}
                     {order.items.length > thumbnails.length ? (
-                      <span className="pill bg-warm-50 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">+{order.items.length - thumbnails.length}</span>
+                      <span className="pill">+{order.items.length - thumbnails.length}</span>
                     ) : null}
                   </div>
                 ) : null}

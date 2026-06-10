@@ -26,21 +26,21 @@ export function CustomizationModal({
 
   return (
     <div className="fixed inset-0 z-30 grid place-items-end bg-slate-950/50 p-2 sm:place-items-center">
-      <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl dark:border-slate-800 dark:bg-slate-900">
-        <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">{product.name}</h2>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Personaliza tu pedido y agrega notas si lo necesitas.</p>
+      <div className="glass-effect w-full max-w-lg rounded-2xl p-4 shadow-2xl">
+        <h2 className="font-display text-lg font-bold tracking-tight text-ink-900 dark:text-ink-50">{product.name}</h2>
+        <p className="mt-1 text-sm text-ink-600 dark:text-ink-300">Personaliza tu pedido y agrega notas si lo necesitas.</p>
 
         <div className="mt-4 space-y-4 text-sm">
           {canSelectTacoOptions ? (
             <>
               <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-200">Tortilla</label>
+                <label className="font-semibold text-ink-700 dark:text-ink-200">Tortilla</label>
                 <div className="mt-2 flex gap-2">
                   {(['maiz', 'harina'] as const).map((item) => (
                     <button
                       key={item}
                       onClick={() => setTortilla(item)}
-                      className={`secondary-btn px-3 py-1.5 capitalize ${tortilla === item ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
+                      className={`secondary-btn px-3 py-2 capitalize ${tortilla === item ? 'border-brand-500/40 bg-white/80 dark:bg-white/10' : ''}`}
                     >
                       {item}
                     </button>
@@ -49,7 +49,7 @@ export function CustomizationModal({
               </div>
 
               <div>
-                <label className="font-semibold text-slate-700 dark:text-slate-200">Extras</label>
+                <label className="font-semibold text-ink-700 dark:text-ink-200">Extras</label>
                 <div className="mt-2 flex gap-2">
                   {(['queso', 'papas'] as const).map((extra) => (
                     <button
@@ -57,7 +57,7 @@ export function CustomizationModal({
                       onClick={() =>
                         setExtras((prev) => (prev.includes(extra) ? prev.filter((item) => item !== extra) : [...prev, extra]))
                       }
-                      className={`secondary-btn px-3 py-1.5 capitalize ${extras.includes(extra) ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
+                      className={`secondary-btn px-3 py-2 capitalize ${extras.includes(extra) ? 'border-accent-500/40 bg-white/80 dark:bg-white/10' : ''}`}
                     >
                       {extra}
                     </button>
@@ -69,13 +69,13 @@ export function CustomizationModal({
 
           {canSelectProtein ? (
             <div>
-              <label className="font-semibold text-slate-700 dark:text-slate-200">Ingrediente</label>
+              <label className="font-semibold text-ink-700 dark:text-ink-200">Ingrediente</label>
               <div className="mt-2 flex flex-wrap gap-2">
                 {proteinOptions.map((item) => (
                   <button
                     key={item}
                     onClick={() => setProtein(item)}
-                    className={`secondary-btn px-3 py-1.5 ${protein === item ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
+                    className={`secondary-btn px-3 py-2 ${protein === item ? 'border-brand-500/40 bg-white/80 dark:bg-white/10' : ''}`}
                   >
                     {item}
                   </button>
@@ -88,9 +88,9 @@ export function CustomizationModal({
         </div>
 
         <div className="mt-5 flex items-center justify-between gap-2">
-          <span className="text-lg font-bold text-orange-700 dark:text-amber-200">${unitPrice}</span>
+          <span className="font-display text-lg font-bold text-brand-600 dark:text-brand-500">${unitPrice}</span>
           <div className="flex items-center gap-2">
-            <button onClick={onClose} className="secondary-btn px-3 py-2 text-sm">
+            <button onClick={onClose} className="secondary-btn px-4 py-2 text-sm">
               Cerrar
             </button>
             <button
@@ -105,7 +105,7 @@ export function CustomizationModal({
                   unitPrice
                 )
               }
-              className="primary-btn px-3 py-2 text-sm"
+              className="primary-btn px-4 py-2 text-sm"
             >
               Agregar
             </button>

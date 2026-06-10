@@ -81,8 +81,8 @@ export default async function BusinessMenuPage({ params }: { params: { negocio: 
   const settings = business ? await getBusinessSettings(business.id) : null;
   const waPhone = settings?.whatsapp_number || process.env.NEXT_PUBLIC_WA_PHONE || "5586495622";
 
-  const businessDisplayName = business?.name || (params.negocio === 'tu-restaurante' ? 'Tu Restaurante' : params.negocio);
-  const headerTitle = 'Tu Restaurante';
+  const businessDisplayName = business?.name || (params.negocio === 'tu-restaurante' ? 'tu restaurante app' : params.negocio);
+  const headerTitle = 'tu restaurante app';
   const businessId = business?.id || params.negocio;
 
   // Obtener productos desde la DB
@@ -93,7 +93,7 @@ export default async function BusinessMenuPage({ params }: { params: { negocio: 
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl pb-24">
-      <Header title={headerTitle} subtitle="Pide en segundos" eventHref={`/${params.negocio}/eventos`} />
+      <Header title={headerTitle} subtitle="Menús interactivos, experiencias deliciosas." eventHref={`/${params.negocio}/eventos`} />
 
       <section className="grid gap-4 p-4 md:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] md:gap-5 md:p-6">
         <div className="space-y-3">

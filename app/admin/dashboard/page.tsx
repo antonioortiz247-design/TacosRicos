@@ -28,7 +28,7 @@ export default async function DashboardPage() {
 
     return (
       <main className="min-h-screen">
-        <Header title="Admin · Tu Restaurante" subtitle="Ventas y rendimiento del día" variant="admin" navLinks={adminNavLinks} />
+        <Header title="Admin · tu restaurante app" subtitle="Ventas y rendimiento del día" variant="admin" navLinks={adminNavLinks} />
         <div className="mx-auto w-full max-w-6xl space-y-4 px-3 pb-8 pt-4 sm:px-4 sm:pb-10 sm:pt-5 md:space-y-5">
           <nav className="grid gap-2 sm:grid-cols-5" aria-label="Accesos rápidos">
             <Link href="/admin/waiter" className="primary-btn justify-center">

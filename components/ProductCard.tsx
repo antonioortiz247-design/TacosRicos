@@ -21,17 +21,17 @@ export function ProductCard({
             src={product.imageUrl}
             alt={product.name}
             fill
-            className="object-cover transition duration-500 group-hover:scale-110"
+            className="object-cover transition-all duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, 150px"
           />
         ) : (
-          <div className="grid h-full place-items-center bg-zinc-100 text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:bg-zinc-800">
+          <div className="grid h-full place-items-center bg-ink-100/80 text-[10px] font-bold uppercase tracking-widest text-ink-500 dark:bg-white/10 dark:text-ink-300">
             Sin Imagen
           </div>
         )}
         {product.category === 'especialidades' && (
           <div className="absolute left-4 top-4">
-            <span className="pill bg-white/90 text-orange-600 shadow-sm backdrop-blur-sm">Top</span>
+            <span className="pill bg-white/70 text-ink-900 shadow-soft backdrop-blur-sm dark:bg-white/10 dark:text-ink-50">Top</span>
           </div>
         )}
       </div>
@@ -39,17 +39,17 @@ export function ProductCard({
       <div className="flex flex-1 flex-col p-5 sm:p-0">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">
+            <h3 className="truncate font-display text-xl font-bold tracking-tight text-ink-900 dark:text-ink-50">
               {product.name}
             </h3>
             {product.description && (
-              <p className="mt-1 line-clamp-2 text-sm font-medium leading-relaxed text-zinc-500 dark:text-zinc-400">
+              <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-ink-600 dark:text-ink-300">
                 {product.description}
               </p>
             )}
           </div>
           <div className="text-right">
-            <p className="text-2xl font-black tracking-tighter text-orange-600 dark:text-orange-400">
+            <p className="font-display text-2xl font-bold tracking-tight text-brand-600 dark:text-brand-500">
               ${product.price}
             </p>
           </div>

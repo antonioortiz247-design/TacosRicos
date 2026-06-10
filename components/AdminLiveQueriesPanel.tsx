@@ -45,30 +45,36 @@ export function AdminLiveQueriesPanel({ negocio }: { negocio?: string }) {
   }, [load]);
 
   return (
-    <section className="rounded-xl border bg-white p-4 text-sm dark:bg-zinc-900">
+    <section className="surface-card p-4 text-sm">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="font-semibold">Consultas SQL en vivo</h2>
-        <button onClick={() => void load()} className="rounded-lg border px-3 py-1 text-xs font-semibold">
+        <h2 className="font-display text-sm font-bold text-ink-900 dark:text-ink-50">Métricas en vivo</h2>
+        <button onClick={() => void load()} className="secondary-btn px-3 py-2 text-xs">
           Actualizar
         </button>
       </div>
 
-      {loading ? <p className="mt-3 text-zinc-500">Cargando resultados...</p> : null}
-      {error ? <p className="mt-3 text-red-600">{error}</p> : null}
+      {loading ? (
+        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          <div className="skeleton h-20 w-full" />
+          <div className="skeleton h-20 w-full" />
+          <div className="skeleton h-20 w-full" />
+        </div>
+      ) : null}
+      {error ? <p className="mt-3 text-sm text-rose-600">{error}</p> : null}
 
       {data ? (
         <div className="mt-3 grid gap-2 sm:grid-cols-3">
-          <article className="rounded-lg border p-3">
-            <p className="text-xs text-zinc-500">Ventas hoy</p>
-            <p className="mt-1 font-bold">${data.salesToday}</p>
+          <article className="rounded-2xl border border-white/60 bg-white/60 p-3 shadow-soft backdrop-blur dark:border-white/10 dark:bg-white/5">
+            <p className="text-xs text-ink-500 dark:text-ink-300">Ventas hoy</p>
+            <p className="mt-1 font-display text-lg font-bold text-ink-900 dark:text-ink-50">${data.salesToday}</p>
           </article>
-          <article className="rounded-lg border p-3">
-            <p className="text-xs text-zinc-500">Pedidos hoy</p>
-            <p className="mt-1 font-bold">{data.ordersToday}</p>
+          <article className="rounded-2xl border border-white/60 bg-white/60 p-3 shadow-soft backdrop-blur dark:border-white/10 dark:bg-white/5">
+            <p className="text-xs text-ink-500 dark:text-ink-300">Pedidos hoy</p>
+            <p className="mt-1 font-display text-lg font-bold text-ink-900 dark:text-ink-50">{data.ordersToday}</p>
           </article>
-          <article className="rounded-lg border p-3">
-            <p className="text-xs text-zinc-500">Ticket promedio</p>
-            <p className="mt-1 font-bold">${data.avgTicket}</p>
+          <article className="rounded-2xl border border-white/60 bg-white/60 p-3 shadow-soft backdrop-blur dark:border-white/10 dark:bg-white/5">
+            <p className="text-xs text-ink-500 dark:text-ink-300">Ticket promedio</p>
+            <p className="mt-1 font-display text-lg font-bold text-ink-900 dark:text-ink-50">${data.avgTicket}</p>
           </article>
         </div>
       ) : null}

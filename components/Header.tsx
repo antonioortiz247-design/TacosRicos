@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { ChevronLeft, Download, QrCode, ShieldCheck } from 'lucide-react';
 
 type HeaderProps = {
   title: string;
@@ -56,11 +57,12 @@ export function Header({ title, subtitle, isOpen, eventHref, variant = 'customer
   };
 
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 px-4 py-3 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-950/85">
+    <header className="sticky top-0 z-20 border-b border-white/60 bg-white/55 px-4 py-3 backdrop-blur-xl dark:border-white/10 dark:bg-ink-950/55">
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
           {backHref ? (
-            <Link href={backHref} className="secondary-btn px-3 py-1.5 text-xs sm:text-sm">
+            <Link href={backHref} className="secondary-btn px-3 py-2 text-xs sm:text-sm">
+              <ChevronLeft size={16} />
               Volver
             </Link>
           ) : null}
@@ -69,18 +71,18 @@ export function Header({ title, subtitle, isOpen, eventHref, variant = 'customer
               <img
                 src="/logotacosricos.png"
                 alt="Logo Tu Restaurante"
-                className="h-12 w-12 rounded-2xl border border-slate-200 object-cover shadow-sm dark:border-slate-700"
+                className="h-11 w-11 rounded-2xl border border-white/60 object-cover shadow-soft backdrop-blur dark:border-white/10"
                 onError={() => setLogoError(true)}
               />
             ) : (
-              <div className="grid h-12 w-12 place-items-center rounded-2xl border border-slate-200 bg-amber-100 text-sm font-bold text-orange-700 dark:border-zinc-700 dark:bg-orange-500/15 dark:text-orange-200">
-                TR
+              <div className="grid h-11 w-11 place-items-center rounded-2xl border border-white/60 bg-white/70 text-sm font-bold text-ink-900 shadow-soft backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-ink-50">
+                tr
               </div>
             )}
           </Link>
           <div className="min-w-0">
-            <h1 className="truncate text-lg font-bold tracking-tight text-slate-900 sm:text-2xl dark:text-slate-100">{title}</h1>
-            {subtitle ? <p className="truncate text-sm text-slate-500 dark:text-slate-400">{subtitle}</p> : null}
+            <h1 className="truncate font-display text-base font-bold tracking-tight text-ink-900 sm:text-xl dark:text-ink-50">{title}</h1>
+            {subtitle ? <p className="truncate text-sm text-ink-500 dark:text-ink-300">{subtitle}</p> : null}
           </div>
         </div>
 
@@ -89,22 +91,30 @@ export function Header({ title, subtitle, isOpen, eventHref, variant = 'customer
             <span
               className={`pill ${
                 openNow
-                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
-                  : 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300'
+                  ? 'bg-white/70 text-ink-700 dark:bg-white/10 dark:text-ink-200'
+                  : 'bg-rose-100/70 text-rose-700 dark:bg-rose-500/15 dark:text-rose-200'
               }`}
             >
               {openNow ? 'Abierto' : 'Cerrado'}
             </span>
           ) : null}
           {variant !== 'admin' ? (
-            <button onClick={handleInstallClick} className="primary-btn px-3 py-1.5 text-xs sm:text-sm">
-              Descargar App
+            <button onClick={handleInstallClick} className="primary-btn px-4 py-2 text-xs sm:text-sm">
+              <Download size={16} />
+              Instalar
             </button>
           ) : null}
           {variant !== 'admin' && eventHref ? (
-            <Link href={eventHref} className="secondary-btn px-3 py-1.5 text-xs sm:text-sm">
-              Reservar evento
+            <Link href={eventHref} className="secondary-btn px-4 py-2 text-xs sm:text-sm">
+              <QrCode size={16} />
+              Eventos
             </Link>
+          ) : null}
+          {variant === 'admin' ? (
+            <span className="pill">
+              <ShieldCheck size={12} className="text-accent-600 dark:text-accent-500" />
+              admin
+            </span>
           ) : null}
         </div>
       </div>
@@ -120,8 +130,8 @@ export function Header({ title, subtitle, isOpen, eventHref, variant = 'customer
                   href={link.href}
                   className={`rounded-full px-4 py-2 text-xs font-extrabold tracking-wide transition ${
                     isActive
-                      ? 'bg-warm-600 text-white'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+                      ? 'bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-soft'
+                      : 'bg-white/60 text-ink-900 hover:bg-white/80 dark:bg-white/10 dark:text-ink-50 dark:hover:bg-white/15'
                   }`}
                 >
                   {link.label}
