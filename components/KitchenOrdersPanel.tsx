@@ -66,7 +66,7 @@ export function KitchenOrdersPanel({ initialOrders, businessId }: { initialOrder
 
             if (!next?.id) return current;
 
-            const shouldShow = next.delivery_type === 'dine_in' && visibleStatuses.includes(next.status);
+            const shouldShow = visibleStatuses.includes(next.status);
             const normalized = {
               ...next,
               total: Number(next.total || 0),
@@ -127,7 +127,7 @@ export function KitchenOrdersPanel({ initialOrders, businessId }: { initialOrder
             </span>
           </div>
           <h3 className="mt-3 text-xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">
-            {order.address || 'Pedido en local'}
+            {order.delivery_type === 'delivery' ? 'A domicilio' : order.delivery_type === 'pickup' ? 'Para recoger' : 'Pedido en local'}
           </h3>
           {order.address_references ? <p className="mt-1 text-sm font-medium text-zinc-500 dark:text-zinc-400">{order.address_references}</p> : null}
         </div>
@@ -180,8 +180,8 @@ export function KitchenOrdersPanel({ initialOrders, businessId }: { initialOrder
     <section className="space-y-5">
       <div className="surface-card flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">Cocina · Pedidos en local</h2>
-          <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Aquí aparecen los pedidos marcados como “En local” para prepararlos y surtirlos.</p>
+          <h2 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">Cocina · Pedidos</h2>
+          <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Aquí aparecen los pedidos en estados “Nuevo / Confirmado / En cocina / Listo” para prepararlos y surtirlos.</p>
         </div>
         <span className="pill bg-amber-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-200">
           {orders.length} activos

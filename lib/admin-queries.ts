@@ -296,7 +296,6 @@ export async function getKitchenOrders(businessIdOrSlug: string): Promise<{ busi
     .from('orders')
     .select('id,total,status,delivery_type,address,address_references,items,created_at')
     .eq('business_id', resolvedBusinessId)
-    .eq('delivery_type', 'dine_in')
     .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
     .order('created_at', { ascending: true });
 
