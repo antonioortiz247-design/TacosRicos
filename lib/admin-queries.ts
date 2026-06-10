@@ -1,3 +1,4 @@
+import type { Product } from './types';
 import { getSupabaseClient } from './supabase';
 
 export const SALES_QUERY_SQL = 'SELECT SUM(total) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
@@ -275,5 +276,28 @@ export async function getKitchenOrders(businessIdOrSlug: string): Promise<{ busi
       total: Number(order.total || 0),
       items: Array.isArray(order.items) ? order.items : []
     })) as KitchenOrder[]
+  };
+}
+
+export async function getOrderEntryData(businessIdOrSlug: string): Promise<{ businessId: string; businessName: string; products: Product[] }> {
+  const supabase = getSupabaseClient();
+  if (!supabase) {
+    return { businessId: businessIdOrSlug, businessName: 'Negocio', products: [] };
+  }
+
+  const resolvedBusinessId = await resolveBusinessId(businessIdOrSlug);
+  const businessId = resolvedBusinessId ?? businessIdOrSlug;
+
+  const [{ data: business }, products] = await Promise.all([
+    resolvedBusinessId
+      ? supabase.from('businesses').select('name').eq('id', resolvedBusinessId).maybeSingle()
+      : Promise.resolve({ data: null }),
+    resolvedBusinessId ? getBusinessProducts(resolvedBusinessId) : Promise.resolve([])
+  ]);
+
+  return {
+    businessId,
+    businessName: business?.name || 'Negocio',
+    products: products as Product[]
   };
 }

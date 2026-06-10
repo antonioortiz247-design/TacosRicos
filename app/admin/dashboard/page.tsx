@@ -23,9 +23,10 @@ export default async function DashboardPage() {
       <main className="min-h-screen">
         <Header title="Admin · Tacos Ricos" subtitle="Ventas y rendimiento del día" />
         <div className="mx-auto w-full max-w-6xl space-y-4 px-3 pb-8 pt-4 sm:px-4 sm:pb-10 sm:pt-5 md:space-y-5">
-          <nav className="grid gap-2 sm:grid-cols-3" aria-label="Apartados administrativos">
+          <nav className="grid gap-2 sm:grid-cols-4" aria-label="Apartados administrativos">
+            <Link href="/admin/waiter" className="primary-btn justify-center">Mesero</Link>
+            <Link href="/admin/kitchen" className="secondary-btn justify-center">Cocina</Link>
             <Link href="/admin/orders" className="secondary-btn justify-center">Pedidos</Link>
-            <Link href="/admin/kitchen" className="primary-btn justify-center">Cocina</Link>
             <Link href="/admin/menu" className="secondary-btn justify-center">Menú</Link>
           </nav>
 

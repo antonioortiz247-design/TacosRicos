@@ -1,9 +1,16 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useCartStore } from '@/store/cart-store';
 
 export function DeliverySelector() {
   const { deliveryType, setDelivery, address, setAddress, address_references, setReferences, zone } = useCartStore();
+
+  useEffect(() => {
+    if (deliveryType === 'dine_in') {
+      setDelivery('pickup');
+    }
+  }, [deliveryType, setDelivery]);
 
   return (
     <section className="surface-card space-y-3">
@@ -17,7 +24,7 @@ export function DeliverySelector() {
         </button>
         <button
           onClick={() => setDelivery('pickup')}
-          className={`secondary-btn w-full ${deliveryType === 'pickup' ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
+          className={`secondary-btn w-full ${deliveryType === 'pickup' || deliveryType === 'dine_in' ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
         >
           Recoger
         </button>
