@@ -39,6 +39,8 @@ export function Cart({ waPhone, businessName, businessId }: { waPhone: string; b
   );
 
   const link = getWhatsAppLink(waPhone, message);
+  const isDineIn = deliveryType === 'dine_in';
+  const needsLocalReference = isDineIn && address.trim().length === 0;
 
   useEffect(() => {
     // Forzado a true para permitir pruebas fuera de horario
@@ -49,7 +51,7 @@ export function Cart({ waPhone, businessName, businessId }: { waPhone: string; b
   }, []);
 
   const handleOrder = async (e: React.MouseEvent) => {
-    if (!isOrderTime || items.length === 0) return;
+    if (!isOrderTime || items.length === 0 || needsLocalReference) return;
     
     setIsSubmitting(true);
     try {
@@ -64,10 +66,13 @@ export function Cart({ waPhone, businessName, businessId }: { waPhone: string; b
       });
 
       if (result.success) {
-        // Una vez guardado en la DB, abrimos WhatsApp
-        window.open(link, '_blank');
-        // Opcionalmente limpiamos el carrito
-        // clearCart();
+        if (isDineIn) {
+          alert('Pedido enviado a cocina.');
+          clearCart();
+        } else {
+          // Una vez guardado en la DB, abrimos WhatsApp
+          window.open(link, '_blank');
+        }
       } else {
         alert(`Error: ${result.error || 'No se pudo procesar tu pedido. Por favor intenta de nuevo.'}`);
       }
@@ -121,12 +126,13 @@ export function Cart({ waPhone, businessName, businessId }: { waPhone: string; b
 
       <button
         onClick={handleOrder}
-        disabled={!isOrderTime || isSubmitting || items.length === 0}
-        className={`primary-btn w-full ${isOrderTime && items.length > 0 ? '' : 'pointer-events-none bg-slate-400 hover:bg-slate-400'} ${isSubmitting ? 'animate-pulse opacity-70' : ''}`}
+        disabled={!isOrderTime || isSubmitting || items.length === 0 || needsLocalReference}
+        className={`primary-btn w-full ${isOrderTime && items.length > 0 && !needsLocalReference ? '' : 'pointer-events-none bg-slate-400 hover:bg-slate-400'} ${isSubmitting ? 'animate-pulse opacity-70' : ''}`}
       >
-        {isSubmitting ? 'Procesando...' : 'Enviar por WhatsApp'}
+        {isSubmitting ? 'Procesando...' : isDineIn ? 'Enviar a cocina' : 'Enviar por WhatsApp'}
       </button>
       {!isOrderTime ? <p className="text-xs text-amber-600">Los pedidos solo están disponibles de 9:30 a 15:00 horas.</p> : null}
+      {needsLocalReference ? <p className="text-xs text-amber-600">Indica la mesa, barra o nombre para enviar el pedido a cocina.</p> : null}
     </aside>
   );
 }

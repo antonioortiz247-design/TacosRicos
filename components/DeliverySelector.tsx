@@ -15,18 +15,24 @@ export function DeliverySelector() {
   return (
     <section className="surface-card space-y-3">
       <h3 className="section-title">Entrega</h3>
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <button
+          onClick={() => setDelivery('dine_in')}
+          className={`secondary-btn w-full ${deliveryType === 'dine_in' ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
+        >
+          En local
+        </button>
         <button
           onClick={() => setDelivery('pickup')}
           className={`secondary-btn w-full ${deliveryType === 'pickup' || deliveryType === 'dine_in' ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
         >
-          Recoger en local
+          Recoger
         </button>
         <button
           onClick={() => setDelivery('delivery', zone)}
           className={`secondary-btn w-full ${deliveryType === 'delivery' ? 'border-orange-300 bg-amber-100 text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/15 dark:text-orange-200' : ''}`}
         >
-          Envío a domicilio
+          Domicilio
         </button>
       </div>
       {deliveryType === 'delivery' ? (
@@ -43,6 +49,22 @@ export function DeliverySelector() {
           </select>
           <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Dirección" className="input-field" />
           <input value={address_references} onChange={(e) => setReferences(e.target.value)} placeholder="Referencias" className="input-field" />
+        </div>
+      ) : null}
+      {deliveryType === 'dine_in' ? (
+        <div className="space-y-2">
+          <input
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Mesa, barra o nombre del cliente"
+            className="input-field"
+          />
+          <input
+            value={address_references}
+            onChange={(e) => setReferences(e.target.value)}
+            placeholder="Notas para cocina (opcional)"
+            className="input-field"
+          />
         </div>
       ) : null}
     </section>
