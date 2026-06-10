@@ -14,7 +14,7 @@ function isWithinOrderSchedule(date: Date): boolean {
 }
 
 export function Cart({ waPhone, businessName, businessId }: { waPhone: string; businessName: string; businessId: string }) {
-  const { items, removeItem, getSubtotal, getTotal, getDeliveryFee, deliveryType, address, address_references, paymentMethod } = useCartStore();
+  const { items, removeItem, getSubtotal, getTotal, getDeliveryFee, deliveryType, address, address_references, paymentMethod, clearCart } = useCartStore();
   const [isOrderTime, setIsOrderTime] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
