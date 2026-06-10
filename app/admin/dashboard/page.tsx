@@ -1,10 +1,10 @@
+import Link from 'next/link';
 import { AdminPanel } from '@/components/AdminPanel';
 import { AdminLiveQueriesPanel } from '@/components/AdminLiveQueriesPanel';
 import { Header } from '@/components/Header';
 import { getOwnerDashboardMetrics } from '@/lib/admin-queries';
 import { RealtimeOrders } from '@/components/RealtimeOrders';
 import { ProductPriceManager } from '@/components/ProductPriceManager';
-import { getRequestedOrConfiguredBusinessIdentifier, normalizeBusinessIdentifier } from '@/lib/business-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,6 +23,13 @@ export default async function DashboardPage() {
       <main className="min-h-screen">
         <Header title="Admin · Tacos Ricos" subtitle="Ventas y rendimiento del día" />
         <div className="mx-auto w-full max-w-6xl space-y-4 px-3 pb-8 pt-4 sm:px-4 sm:pb-10 sm:pt-5 md:space-y-5">
+          <nav className="grid gap-2 sm:grid-cols-4" aria-label="Apartados administrativos">
+            <Link href="/admin/waiter" className="primary-btn justify-center">Mesero</Link>
+            <Link href="/admin/kitchen" className="secondary-btn justify-center">Cocina</Link>
+            <Link href="/admin/orders" className="secondary-btn justify-center">Pedidos</Link>
+            <Link href="/admin/menu" className="secondary-btn justify-center">Menú</Link>
+          </nav>
+
           {metrics.products.length === 0 && (
             <section className="surface-card border-amber-200/70 bg-amber-50/80 p-4 sm:p-5 dark:border-amber-900/50 dark:bg-amber-900/20">
               <h3 className="text-base font-extrabold tracking-tight text-amber-800 sm:text-lg dark:text-amber-200">

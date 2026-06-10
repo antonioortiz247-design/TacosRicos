@@ -15,6 +15,8 @@ PWA mobile-first para taquería con pedidos por WhatsApp, personalización de ta
 - `/{negocio}/eventos`
 - `/admin/dashboard`
 - `/admin/orders`
+- `/admin/waiter`
+- `/admin/kitchen`
 - `/admin/menu`
 - `/admin/settings`
 
@@ -38,6 +40,7 @@ npm run dev
 - `MERCADO_PAGO_ACCESS_TOKEN`
 - `NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY`
 - `NEXT_PUBLIC_WA_PHONE`
+- `WAITER_NAMES` (lista separada por comas para usuarios/meseros; opcional)
 
 ## Deploy en Vercel
 
@@ -53,5 +56,5 @@ npm run dev
 - Carrito sin pedido mínimo.
 - Delivery por zonas con dirección y referencias.
 - Pago con efectivo, transferencia y tarjeta (Mercado Pago).
-- Dashboard dueño y panel de pedidos.
+- Dashboard dueño, panel de pedidos, apartado de mesero y pantalla de cocina para comandas en local.
 - PWA instalable con `manifest` + `next-pwa`.

@@ -13,11 +13,13 @@ type OrderRow = {
   delivery_type: string;
 };
 
-const statuses = ['pending', 'delivered', 'cancelled', 'paid', 'pending_payment'] as const;
+const statuses = ['pending', 'preparing', 'ready', 'delivered', 'cancelled', 'paid', 'pending_payment'] as const;
 type AdminOrderStatus = (typeof statuses)[number];
 
 const statusLabels: Record<AdminOrderStatus, string> = {
   pending: 'Pendiente',
+  preparing: 'En cocina',
+  ready: 'Listo',
   delivered: 'Entregado',
   cancelled: 'Cancelado',
   paid: 'Pagado',
@@ -25,6 +27,8 @@ const statusLabels: Record<AdminOrderStatus, string> = {
 };
 
 function normalizeOrderStatus(status: string): AdminOrderStatus {
+  if (status === 'preparing') return 'preparing';
+  if (status === 'ready') return 'ready';
   if (status === 'delivered') return 'delivered';
   if (status === 'cancelled' || status === 'canceled') return 'cancelled';
   if (status === 'paid') return 'paid';
@@ -109,8 +113,8 @@ export function OrdersPanel({ initialOrders }: { initialOrders: any[] }) {
                     <p className="text-xs text-zinc-500">{new Date(order.created_at).toLocaleTimeString()}</p>
                   </td>
                   <td className="px-4 py-4">
-                    <p className="font-medium">{order.address || 'Para recoger'}</p>
-                    <p className="text-xs text-zinc-500 uppercase">{order.delivery_type === 'delivery' ? 'A domicilio' : 'Recoger'}</p>
+                    <p className="font-medium">{order.address || (order.delivery_type === 'dine_in' ? 'En local' : 'Para recoger')}</p>
+                    <p className="text-xs text-zinc-500 uppercase">{order.delivery_type === 'delivery' ? 'A domicilio' : order.delivery_type === 'dine_in' ? 'En local' : 'Recoger'}</p>
                   </td>
                   <td className="px-4 py-4 text-right font-bold text-warm-700 dark:text-warm-400">
                     ${order.total}
@@ -125,6 +129,8 @@ export function OrdersPanel({ initialOrders }: { initialOrders: any[] }) {
                       } ${
                         order.status === 'pending' ? 'border-amber-200 bg-amber-50 text-amber-700' :
                         order.status === 'pending_payment' ? 'border-orange-200 bg-orange-50 text-orange-700' :
+                        order.status === 'preparing' ? 'border-purple-200 bg-purple-50 text-purple-700' :
+                        order.status === 'ready' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' :
                         order.status === 'delivered' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' :
                         order.status === 'paid' ? 'border-sky-200 bg-sky-50 text-sky-700' :
                         'border-rose-200 bg-rose-50 text-rose-700'

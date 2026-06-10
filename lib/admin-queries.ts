@@ -1,3 +1,4 @@
+import type { Product } from './types';
 import { getSupabaseClient } from './supabase';
 
 export const SALES_QUERY_SQL = 'SELECT SUM(total) FROM orders WHERE DATE(created_at)=CURRENT_DATE;';
@@ -234,5 +235,69 @@ export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
     recentOrders: (recentResult.data ?? []) as any[],
     products: (productsResult.data ?? []).map(mapProductRow),
     businessName: currentBiz?.name || 'Negocio'
+  };
+}
+
+export type KitchenOrder = {
+  id: string;
+  total: number;
+  status: string;
+  delivery_type: string;
+  address?: string | null;
+  address_references?: string | null;
+  items: any[];
+  created_at: string;
+};
+
+export async function getKitchenOrders(businessIdOrSlug: string): Promise<{ businessId: string; orders: KitchenOrder[] }> {
+  const supabase = getSupabaseClient();
+  if (!supabase) return { businessId: businessIdOrSlug, orders: [] };
+
+  const resolvedBusinessId = await resolveBusinessId(businessIdOrSlug);
+  if (!resolvedBusinessId) return { businessId: businessIdOrSlug, orders: [] };
+
+  const { data, error } = await supabase
+    .from('orders')
+    .select('id,total,status,delivery_type,address,address_references,items,created_at')
+    .eq('business_id', resolvedBusinessId)
+    .eq('delivery_type', 'dine_in')
+    .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching kitchen orders:', error);
+    return { businessId: resolvedBusinessId, orders: [] };
+  }
+
+  return {
+    businessId: resolvedBusinessId,
+    orders: (data ?? []).map((order) => ({
+      ...order,
+      total: Number(order.total || 0),
+      items: Array.isArray(order.items) ? order.items : []
+    })) as KitchenOrder[]
+  };
+}
+
+export async function getOrderEntryData(businessIdOrSlug: string): Promise<{ businessId: string; businessName: string; products: Product[] }> {
+  const supabase = getSupabaseClient();
+  if (!supabase) {
+    return { businessId: businessIdOrSlug, businessName: 'Negocio', products: [] };
+  }
+
+  const resolvedBusinessId = await resolveBusinessId(businessIdOrSlug);
+  const businessId = resolvedBusinessId ?? businessIdOrSlug;
+
+  const [{ data: business }, products] = await Promise.all([
+    resolvedBusinessId
+      ? supabase.from('businesses').select('name').eq('id', resolvedBusinessId).maybeSingle()
+      : Promise.resolve({ data: null }),
+    resolvedBusinessId ? getBusinessProducts(resolvedBusinessId) : Promise.resolve([])
+  ]);
+
+  return {
+    businessId,
+    businessName: business?.name || 'Negocio',
+    products: products as Product[]
   };
 }
