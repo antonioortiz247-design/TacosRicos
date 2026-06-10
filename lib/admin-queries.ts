@@ -236,3 +236,44 @@ export async function getOwnerDashboardMetrics(businessIdOrSlug: string) {
     businessName: currentBiz?.name || 'Negocio'
   };
 }
+
+export type KitchenOrder = {
+  id: string;
+  total: number;
+  status: string;
+  delivery_type: string;
+  address?: string | null;
+  address_references?: string | null;
+  items: any[];
+  created_at: string;
+};
+
+export async function getKitchenOrders(businessIdOrSlug: string): Promise<{ businessId: string; orders: KitchenOrder[] }> {
+  const supabase = getSupabaseClient();
+  if (!supabase) return { businessId: businessIdOrSlug, orders: [] };
+
+  const resolvedBusinessId = await resolveBusinessId(businessIdOrSlug);
+  if (!resolvedBusinessId) return { businessId: businessIdOrSlug, orders: [] };
+
+  const { data, error } = await supabase
+    .from('orders')
+    .select('id,total,status,delivery_type,address,address_references,items,created_at')
+    .eq('business_id', resolvedBusinessId)
+    .eq('delivery_type', 'dine_in')
+    .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching kitchen orders:', error);
+    return { businessId: resolvedBusinessId, orders: [] };
+  }
+
+  return {
+    businessId: resolvedBusinessId,
+    orders: (data ?? []).map((order) => ({
+      ...order,
+      total: Number(order.total || 0),
+      items: Array.isArray(order.items) ? order.items : []
+    })) as KitchenOrder[]
+  };
+}
